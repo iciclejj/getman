@@ -5,6 +5,7 @@ import command_handlers
 import database as db
 from gm_argparse import init_parser
 from init_getman import init_getman, needs_init
+import filenames as names
 
 def main():
     try:
@@ -26,7 +27,7 @@ def main():
         elif command == 'upgrade':
             command_handlers.upgrade()
         elif command == 'init':
-            return
+            command_handlers.init()
     except Exception as exception:
         print('ERROR:', exception)
 
