@@ -25,14 +25,7 @@ SUPPORTED_FILETYPES = ['application/x-pie-executable']
 
 # TODO: add commandline arg for 'force'
 def install(url, force=False, db_name=None):
-    # load database
-    if db_name is None:
-        db_name = config.get_config()['db_path']
-
-    db_path = os.path.join(names.DB_DIR_PATH, db_name)
-
-    with open(db_path, 'r') as db_file:
-        db_dict = json.loads(db_file.read())
+    db_dict = db.get_db_dict(db_name)
     
     # download file and metadata
     headers = _get_headers(url) # headers is an EmailMessage => returns None if key not found
@@ -87,21 +80,13 @@ def install(url, force=False, db_name=None):
             'md5_base64': content_md5,
     }
 
-    db.overwrite_db(db_path, db_dict)
+    db.overwrite_db(db_name, db_dict)
 
     print(f'{install_filename_stem} successfully installed to {install_path}')
 
 def update(db_name=None):
     # TODO: get_config
-    if db_name is None:
-        db_name = names.DEFAULT_DB_FILE_NAME
-
-    db_path = os.path.join(names.DB_DIR_PATH, db_name)
-
-    with open(db_path, 'r') as db_file:
-        db_dict = json.loads(db_file.read())
-
-    n_upgradeable = 0
+    db_dict = db.get_db_dict(db_name)
 
     for url, package_metadata in db_dict['packages'].items():
         headers = _get_headers(url)
@@ -113,38 +98,32 @@ def update(db_name=None):
 
         if content_md5 != package_metadata['md5_base64']:
             db_dict['upgradeable'][url] = {}
-            n_upgradeable += 1
 
-    db.overwrite_db(db_path, db_dict)
+    db.overwrite_db(db_name, db_dict)
+
+    upgradeable = db.get_db_dict(db_name)['upgradeable']
+    n_upgradeable = len(upgradeable)
 
     print(f'Update successful. Upgradeable packages: {n_upgradeable}')
 
 def upgrade(db_name=None):
-    # TODO: maybe reduce this boilerplate everywhere
-    #       get_config
-    if db_name is None:
-        db_name = names.DEFAULT_DB_FILE_NAME
-
-    db_path = os.path.join(names.DB_DIR_PATH, db_name)
-
-    with open(db_path, 'r') as db_file:
-        db_dict = json.loads(db_file.read())
+    upgradeable = db.get_db_dict(db_name)['upgradeable']
 
     n_upgraded = 0
 
     # TODO: try/except
     #       show total GB before upgrade (in install too)
     #       progress bar (in install too)
-    for url in list(db_dict['upgradeable'].keys()): # list to allow delete as we go
+    for url in list(upgradeable.keys()): # list to allow delete as we go
         install(url, force=True) # TODO: probably make a separate upgrade installer
-        del db_dict['upgradeable'][url]
+        del upgradeable[url]
         n_upgraded += 1
 
     # reload db_dict after modification by install (REMOVE IF IMPLEMENTING INDEPENDENT UPGRADER)
-    with open(db_path, 'r') as db_file:
-        db_dict['packages'] = json.loads(db_file.read())['packages']
+    db_dict = db.get_db_dict(db_name)
+    db_dict['upgradeable'] = upgradeable
 
-    db.overwrite_db(db_path, db_dict)
+    db.overwrite_db(db_name, db_dict)
 
     if n_upgraded > 0:
         print(f'Upgrade successful. Upgraded packages: {n_upgraded}')

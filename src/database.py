@@ -27,9 +27,29 @@ def init_db(db_name=None, overwrite=True):
     
     return db_path
 
-def overwrite_db(db_path, db_dict):
+def get_db_dict(db_name=None):
+    # TODO: probably package this boilerplate into a function (do this everywhere)
+    #                (possibly remove custom db altogether) 
+    if db_name is None:
+        db_name = names.DEFAULT_DB_FILE_NAME
+
+    db_path = os.path.join(names.DB_DIR_PATH, db_name)
+
+    with open(db_path, 'r') as db_file:
+        db_dict = json.loads(db_file.read())
+
+    return db_dict
+
+# TODO: possibly make db_name argument not need .json (automatically append it)
+#               (do this everywhere)
+def overwrite_db(db_name, db_dict):
+    if db_name is None:
+        db_name = names.DEFAULT_DB_FILE_NAME
+
+    db_path = os.path.join(names.DB_DIR_PATH, db_name)
     db_json = json.dumps(db_dict)
 
+    # TODO: add try/except
     with open(db_path, 'w+') as db_file:
         db_file.write(db_json)
     
