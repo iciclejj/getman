@@ -23,6 +23,8 @@ def main():
             command_handlers.install(args.url)
         elif command == 'update':
             command_handlers.update()
+        elif command == 'upgrade':
+            command_handlers.upgrade()
         elif command == 'init':
             return
     except Exception as exception:

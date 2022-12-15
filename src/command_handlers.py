@@ -21,7 +21,8 @@ import database as db
 SUPPORTED_CONTENT_TYPE_FIRSTS = ['application'] # must use startswith (after '/' is excluded)
 SUPPORTED_FILETYPES = ['application/x-pie-executable']
 
-def install(url, db_name=None):
+# TODO: add commandline arg for 'force'
+def install(url, force=False, db_name=None):
     # load database
     if db_name is None:
         db_name = names.DEFAULT_DB_FILE_NAME
@@ -39,7 +40,7 @@ def install(url, db_name=None):
     content_type_first = headers['content-type'].partition('/')[0]
 
     # TODO: make listing of filename nicer (currently shows download_filename)
-    if url in db_dict['packages']:
+    if not force and url in db_dict['packages']:
         print(f'{download_filename} already in database')
         return
 
@@ -105,6 +106,22 @@ def update(db_name=None):
 
         if content_md5 != metadata['md5_base64']:
             db_dict['upgradeable'][url] = {}
+
+    db.overwrite_db(db_path, db_dict)
+
+def upgrade(db_name=None):
+    # TODO: maybe reduce this boilerplate everywhere
+    if db_name is None:
+        db_name = names.DEFAULT_DB_FILE_NAME
+
+    db_path = os.path.join(names.DB_DIR_PATH, db_name)
+
+    with open(db_path, 'r') as db_file:
+        db_dict = json.loads(db_file.read())
+
+    for url in list(db_dict['upgradeable'].keys()): # list to allow delete as we go
+        install(url, force=True) # TODO: probably make a separate upgrade installer
+        del db_dict['upgradeable'][url]
 
     db.overwrite_db(db_path, db_dict)
 
