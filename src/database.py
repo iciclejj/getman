@@ -42,11 +42,12 @@ if __name__ == '__main__':
 
     db_path = init_db(db_name, db_dir)
 
-    with open(db_path, 'r') as json_file:
-        db_dict = json.loads(json_file.read())
-
-    print('db_path:\n', db_path)
-    print('db_json:\n', db_dict)
-
-    os.remove(db_path)
+    try:
+        with open(db_path, 'r') as json_file:
+            db_dict = json.loads(json_file.read())
+        print(f'{db_path} successfully created. Now removing.\n')
+        print('{db_name} as dict:\n', db_dict)
+        os.remove(db_path)
+    except:
+        print(f'ERROR:\n{download_filepath} was not created.')
 
