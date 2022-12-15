@@ -149,15 +149,20 @@ if __name__ == '__main__':
 
     headers = _get_headers(url)
 
-    filename = headers.get_filename()
+    download_filename = headers.get_filename() + '.test'
 
-    filepath = os.path.join(names.DEFAULT_DEB_PACKAGE_DIR_PATH, filename)
-    local_filepath = urllib.request.urlretrieve(url, filename=filepath)
+    download_filepath = os.path.join(names.DEFAULT_DEB_PACKAGE_DIR_PATH, download_filename)
+    urllib.request.urlretrieve(url, filename=download_filepath)
 
-    print(local_filepath, '\n\n')
+    print(f'download_filepath: {download_filepath}')
 
-    print(headers)
-    print(headers['content-md5'])
-    print(headers.get_filename())
-    
+    print(f'headers:\n\n{headers}')
+    print(f'content-md5 in headers:\n{headers["content-md5"]}\n')
+    print(f'filename in headers:\n{headers.get_filename()}\n')
+
+    if os.path.isfile(download_filepath):
+        print(f'{download_filepath} successfully saved. Now removing.')
+        os.remove(download_filepath)
+    else:
+        print(f'ERROR:\n{download_filepath} was not created.')
 
