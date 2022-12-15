@@ -20,6 +20,8 @@ def main():
     try:
         if command == 'install':
             command_handlers.install(args.url)
+        elif command == 'uninstall':
+            command_handlers.uninstall(args.package, args.url)
         elif command == 'update':
             command_handlers.update()
         elif command == 'upgrade':

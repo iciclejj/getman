@@ -24,6 +24,11 @@ SUPPORTED_CONTENT_TYPE_FIRSTS = ['application'] # must use startswith (after '/'
 SUPPORTED_FILETYPES = ['application/x-pie-executable']
 
 # TODO: add commandline arg for 'force'
+#
+#       EXPERIMENTAL TODOS:
+#       auto-detect system/architecture
+#       auto-detect site-specific preferred download urls (for example from git repo)
+#       use api when supported (for example api.github.com)
 def install(url, force=False, db_name=None):
     db_dict = db.get_db_dict(db_name)
     
@@ -127,6 +132,31 @@ def upgrade(db_name=None):
         print(f'Upgrade successful. Upgraded packages: {n_upgraded}')
     else:
         print(f'Nothing to upgrade.')
+
+def uninstall(package, is_url, db_name=None):
+    if is_url:
+        url = package
+    else:
+        url = db.get_url_from_install_filename(db_name, package)
+
+    # make sure package exists
+    if url is None or not db.is_package_url(db_name, url):
+        print('Package not found in database.') # TODO: maybe turn this into an exception
+        return
+
+    # assume it exists from here on
+    install_path = db.get_package_attribute(db_name, url, 'install_path')
+
+    try:
+        os.remove(install_path)
+        print('Program removed...')
+    except FileNotFoundError as e:
+        print('Program not found in install path, skipping...')
+
+    db.remove_package_entry(db_name, url)
+    print('Package entry removed...')
+
+    print('Package uninstalled.')
 
 def init():
     if not init_getman.needs_init():
