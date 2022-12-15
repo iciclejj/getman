@@ -18,7 +18,7 @@ import database as db
 
 # TODO: create separate .py files for each command and turn this into an "interface" file
 
-SUPPORTED_CONTENT_TYPE_FIRSTS = ['application/'] # must use startswith (after '/' is excluded)
+SUPPORTED_CONTENT_TYPE_FIRSTS = ['application'] # must use startswith (after '/' is excluded)
 SUPPORTED_FILETYPES = ['application/x-pie-executable']
 
 def install(url, db_name=None):
