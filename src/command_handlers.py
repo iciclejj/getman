@@ -15,6 +15,7 @@ import magic
 # local modules
 import filenames as names
 import database as db
+import config
 
 # TODO: create separate .py files for each command and turn this into an "interface" file
 
@@ -25,7 +26,7 @@ SUPPORTED_FILETYPES = ['application/x-pie-executable']
 def install(url, force=False, db_name=None):
     # load database
     if db_name is None:
-        db_name = names.DEFAULT_DB_FILE_NAME
+        db_name = config.get_config()['db_path']
 
     db_path = os.path.join(names.DB_DIR_PATH, db_name)
 
