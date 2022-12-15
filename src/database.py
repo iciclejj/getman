@@ -19,7 +19,8 @@ def init_db(db_name=None, overwrite=True):
     db_dict = {
             'created_at': str(datetime.now()),
             'updated_at': str(datetime.now()),
-            'packages': {}
+            'packages': {},
+            'upgradeable': {}
     }
 
     overwrite_db(db_path, db_dict)

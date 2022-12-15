@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-LEGAL_COMMANDS = ['install', 'init']
+LEGAL_COMMANDS = ['install', 'update', 'init']
 
 def init_parser():
     command = sys.argv[1]
@@ -16,6 +16,8 @@ def init_parser():
 
     if command == 'install':
         parser.add_argument('url', help='URL from where to download the deb package')
+    elif command == 'update':
+        pass
     elif command =='init':
         pass
 

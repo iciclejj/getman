@@ -21,6 +21,8 @@ def main():
     try:
         if command == 'install':
             command_handlers.install(args.url)
+        elif command == 'update':
+            command_handlers.update()
         elif command == 'init':
             return
     except Exception as exception:

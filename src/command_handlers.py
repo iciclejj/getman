@@ -27,7 +27,6 @@ def install(url, db_name=None):
         db_name = names.DEFAULT_DB_FILE_NAME
 
     db_path = os.path.join(names.DB_DIR_PATH, db_name)
-    print(db_path)
 
     with open(db_path, 'r') as db_file:
         db_dict = json.loads(db_file.read())
@@ -87,9 +86,27 @@ def install(url, db_name=None):
 
     db.overwrite_db(db_path, db_dict)
 
-def update():
-    pass
-    #content_md5 = headers['content-md5'] 
+def update(db_name=None):
+    if db_name is None:
+        db_name = names.DEFAULT_DB_FILE_NAME
+
+    db_path = os.path.join(names.DB_DIR_PATH, db_name)
+
+    with open(db_path, 'r') as db_file:
+        db_dict = json.loads(db_file.read())
+
+    for url, metadata in db_dict['packages'].items():
+        headers = _get_headers(url)
+        content_md5 = headers['content-md5'] # TODO: maybe rename content_md5 to md5_base64 (everywhere)
+
+        if content_md5 is None:
+            print('Warning: not something isn\'t implemented yet, skipping package Xd')
+            continue
+
+        if content_md5 != metadata['md5_base64']:
+            db_dict['upgradeable'][url] = {}
+
+    db.overwrite_db(db_path, db_dict)
 
 def _get_base64_md5(file_path):
     file_hash = hashlib.md5()
