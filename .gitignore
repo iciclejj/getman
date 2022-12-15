@@ -1,0 +1,7 @@
+# python dirs
+.venv/
+__pycache__/
+
+# vim files
+*.swp
+*.swo
