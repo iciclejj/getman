@@ -5,3 +5,11 @@ __pycache__/
 # vim files
 *.swp
 *.swo
+
+# nuitka files
+main.build/
+main.dist/
+main.onefile-build/
+
+# executables
+getman
