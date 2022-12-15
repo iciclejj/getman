@@ -36,7 +36,7 @@ def delete_everything():
     shutil.rmtree(names.DATA_DIR_PATH)
     print('getman directories deleted.\n')
 
-# add check for config files and subdirs
+# TODO: add check for config files and subdirs
 if __name__ == '__main__':
     init_getman()
 

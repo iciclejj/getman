@@ -31,7 +31,6 @@ def install(url, force=False, db_name=None):
     headers = _get_headers(url) # headers is an EmailMessage => returns None if key not found
 
     download_filename = headers.get_filename()
-
     content_type_first = headers['content-type'].partition('/')[0]
 
     # TODO: make listing of filename nicer (currently shows download_filename)
@@ -44,7 +43,7 @@ def install(url, force=False, db_name=None):
         print('Warning: could not determine if correct filetype before downloading') # TODO: proper warning
 
     download_path = os.path.join(names.DEFAULT_DEB_PACKAGE_DIR_PATH, download_filename)
-    urllib.request.urlretrieve(url, filename=download_path) # downloads file
+    urllib.request.urlretrieve(url, filename=download_path) # downloads file to download_path
 
     # install file
     filetype = magic.from_file(download_path, mime=True)
@@ -85,7 +84,6 @@ def install(url, force=False, db_name=None):
     print(f'{install_filename_stem} successfully installed to {install_path}')
 
 def update(db_name=None):
-    # TODO: get_config
     db_dict = db.get_db_dict(db_name)
 
     for url, package_metadata in db_dict['packages'].items():

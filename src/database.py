@@ -30,6 +30,7 @@ def init_db(db_name=None, overwrite=True):
 def get_db_dict(db_name=None):
     # TODO: probably package this boilerplate into a function (do this everywhere)
     #                (possibly remove custom db altogether) 
+    #       use get_config to db name when None
     if db_name is None:
         db_name = names.DEFAULT_DB_FILE_NAME
 
