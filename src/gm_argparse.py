@@ -29,6 +29,7 @@ def init_parser():
 
 if __name__ == '__main__':
     command, args, parser = init_parser()
-    print(command)
-    print(args)
-    print(parser)
+
+    print(f'command:\n{command}\n')
+    print(f'args:\n{args}\n')
+    print(f'parser:\n{parser}')
