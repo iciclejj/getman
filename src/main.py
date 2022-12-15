@@ -14,8 +14,6 @@ def main():
         print(exception)
         return
 
-    args = parser.parse_args(args=sys.argv[2:])
-
     if needs_init():
         init_getman()
 
