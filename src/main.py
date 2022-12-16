@@ -40,7 +40,7 @@ def main():
         elif command == 'list':
             command_handlers.list()
         elif command == 'init':
-            command_handlers.init()
+            command_handlers.init(args.purge)
     except Exception as exception: # TODO: HANDE THIS PROPERLY
         print('ERROR:', exception)
 

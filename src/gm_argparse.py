@@ -43,6 +43,9 @@ def init_parser():
         parser.prog += ' list'
     elif command == 'init':
         parser.prog += ' init'
+        parser.add_argument('-p', '--purge', action='store_true',
+                            help='Delete all getman directories before'
+                                 ' running initialization')
 
     args = parser.parse_args(args)
 
