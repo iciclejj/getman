@@ -10,8 +10,6 @@ from base64 import b64encode
 from datetime import datetime
 import ssl # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
 
-
-
 # pip libraries
 import magic
 import certifi # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
@@ -31,7 +29,7 @@ SUPPORTED_FILETYPES = ['application/x-pie-executable']
 SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 ssl._create_default_https_context = lambda: SSL_CONTEXT
 
-# TODO: add commandline arg for 'force'
+# TODO: 
 #
 #       EXPERIMENTAL TODOS:
 #       auto-detect system/architecture
@@ -46,7 +44,7 @@ def install(url, install_filename, force, db_name=None):
     download_filename = headers.get_filename()
     content_type_first = headers['content-type'].partition('/')[0]
 
-    # TODO_: maybe turn return into exception
+    # TODO: maybe turn return into exception
     if download_filename is None:
         if install_filename is None:
             print('Could not determine download filename.'
@@ -64,10 +62,10 @@ def install(url, install_filename, force, db_name=None):
         print(f'Package already in database as {install_filename_curr}')
         return
 
-
     # a bit useless in its current state
     if content_type_first not in SUPPORTED_CONTENT_TYPE_FIRSTS:
-        print('Warning: could not determine if correct filetype before downloading') # TODO: proper warning
+        print('Warning: could not determine if correct filetype before downloading.'
+              ' Will check again after download.') # TODO: proper warning
 
     download_path = os.path.join(names.DEFAULT_DEB_PACKAGE_DIR_PATH, download_filename)
     urllib.request.urlretrieve(url, filename=download_path) # downloads file to download_path
@@ -94,7 +92,7 @@ def install(url, install_filename, force, db_name=None):
     except Exception  as e: # TODO: HANDLE THIS PROPERLY !!!
         os.remove(download_path)
         print(e)
-        print('Run with \'sudo -E\'')
+        print('Run with sudo (\'sudo -E\' if running getman as a python script)')
         return
 
     content_md5 = _get_base64_md5(install_path)
@@ -165,7 +163,7 @@ def uninstall(package, is_url, db_name=None):
 
     # make sure package exists
     if url is None or not db.is_package_url(db_name, url):
-        print('Package not found in database.') # TODO: maybe turn this into an exception
+        print('Package not found in database.')
         return
 
     # assume it exists from here on
@@ -178,8 +176,8 @@ def uninstall(package, is_url, db_name=None):
         print('Program not found in install path, skipping...')
 
     db.remove_package_entry(db_name, url)
-    print('Package entry removed...')
 
+    print('Package entry removed...')
     print('Package uninstalled.')
 
 def list(db_name=None):
@@ -193,11 +191,14 @@ def init():
     if not init_getman.needs_init():
         print('getman already initialized. Type "DELETE" and press Enter to delete all'
               ' getman directories and re-run initialization.\n')
+
         print('directories that will be deleted:')
         print(names.DATA_DIR_PATH)
         print(names.CONFIG_DIR_PATH, '\n')
+
         user_input = input()
         print()
+
         if user_input == 'DELETE':
             print('Deleting...')
             init_getman.delete_everything()

@@ -70,7 +70,6 @@ def remove_package_entry(db_name, url, include_upgradeable=True):
 
     overwrite_db(db_name, db_dict)
 
-
 def is_package_url(db_name, url):
     packages = get_db_dict(db_name)['packages']
 
@@ -104,8 +103,10 @@ if __name__ == '__main__':
     try:
         with open(db_path, 'r') as json_file:
             db_dict = json.loads(json_file.read())
+
         print(f'{db_path} successfully created. Now removing.\n')
         print('{db_name} as dict:\n', db_dict)
+
         os.remove(db_path)
     except:
         print(f'ERROR:\n{download_filepath} was not created.')

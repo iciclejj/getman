@@ -26,8 +26,6 @@ def init_getman():
 
 # TODO: check for both config and db, and let user decide whether to do a full reset
 def needs_init():
-    missing_files = []
-
     if not os.path.isfile(names.CONFIG_FILE_PATH):
         return True
 
