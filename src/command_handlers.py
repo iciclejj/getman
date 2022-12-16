@@ -140,7 +140,9 @@ def upgrade(db_name=None):
     #       show total GB before upgrade (in install too)
     #       progress bar (in install too)
     for url in list(upgradeable.keys()): # list to allow delete as we go
-        install(url, force=True) # TODO: probably make a separate upgrade installer
+        install_filename = db.get_package_attribute(db_name, url,
+                                                    'install_filename')
+        install(url, install_filename, force=True) # TODO: probably make a separate upgrade installer
         del upgradeable[url]
         n_upgraded += 1
 
@@ -180,7 +182,7 @@ def uninstall(package, is_url, db_name=None):
     print('Package entry removed...')
     print('Package uninstalled.')
 
-def list(db_name=None):
+def list_(db_name=None):
     packages = db.get_db_dict(db_name)['packages']
 
     for url, package_metadata in packages.items():

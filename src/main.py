@@ -8,6 +8,9 @@ from init_getman import init_getman, needs_init
 import filenames as names
 
 # TODO: add check for residual download files
+#       ADD COMMANDLINE AUTOCOMPLETE !!!
+
+# TODO PRIORITY: command_handlers 92, 118, 139
 
 def main():
     try:
@@ -38,7 +41,7 @@ def main():
         elif command == 'upgrade':
             command_handlers.upgrade()
         elif command == 'list':
-            command_handlers.list()
+            command_handlers.list_()
         elif command == 'init':
             command_handlers.init(args.purge)
     except Exception as exception: # TODO: HANDE THIS PROPERLY
