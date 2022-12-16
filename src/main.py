@@ -26,6 +26,8 @@ def main():
             command_handlers.update()
         elif command == 'upgrade':
             command_handlers.upgrade()
+        elif command == 'list':
+            command_handlers.list()
         elif command == 'init':
             command_handlers.init()
     except Exception as exception:

@@ -182,6 +182,13 @@ def uninstall(package, is_url, db_name=None):
 
     print('Package uninstalled.')
 
+def list(db_name=None):
+    packages = db.get_db_dict(db_name)['packages']
+
+    for url, package_metadata in packages.items():
+        install_filename = package_metadata['install_filename']
+        print(install_filename)
+
 def init():
     if not init_getman.needs_init():
         print('getman already initialized. Type "DELETE" and press Enter to delete all'

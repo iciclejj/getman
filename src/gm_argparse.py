@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-LEGAL_COMMANDS = ['install', 'uninstall', 'update', 'upgrade', 'init']
+LEGAL_COMMANDS = ['install', 'uninstall', 'update', 'upgrade', 'list', 'init']
 
 def init_parser():
     command = sys.argv[1]
@@ -39,7 +39,9 @@ def init_parser():
         parser.prog += ' update'
     elif command == 'upgrade':
         parser.prog += ' upgrade'
-    elif command =='init':
+    elif command == 'list':
+        parser.prog += ' list'
+    elif command == 'init':
         parser.prog += ' init'
 
     args = parser.parse_args(args)
