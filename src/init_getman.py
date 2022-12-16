@@ -11,7 +11,7 @@ from config import init_config
 def init_getman():
     print('Initializing getman files and directories in:')
     print(names.DATA_DIR_PATH)
-    print(names.CONFIG_DIR_PATH, '\n')
+    print(names.CONFIG_DIR_PATH)
 
     if not os.path.isdir(names.DATA_DIR_PATH):
         os.makedirs(names.DATA_DIR_PATH)
@@ -27,24 +27,28 @@ def init_getman():
     # feel like there's a way to clean this up
     if not os.path.isfile(db_path):
         db_path = init_db()
-        print('Database file created at {db_path}')
+        print(f'Database file created at {db_path}')
     else:
-        answer = input('Default database file already exists at {db_path}.'
-                       ' Overwrite? (y/N): ')
+        answer = input(f'Default database file already exists at {db_path}.'
+                       f' Overwrite? (y/N): ')
 
         if answer in ['y', 'Y']:
             db_path = init_db()
-            print('Database file created at {db_path}')
+            print(f'Database file created at {db_path}')
         else:
             print('Keeping old database file.')
 
-    if os.path.isfile(names.CONFIG_FILE_PATH):
-        answer = input('Config file already exists as'
-                       ' {names.CONFIG_FILE_PATH}. Overwrite? (y/N): ')
+    # feel like there's a way to clean this up
+    if not os.path.isfile(names.CONFIG_FILE_PATH):
+        config_path = init_config(db_path)
+        print(f'Config file created at {config_path}')
+    else:
+        answer = input(f'Config file already exists as'
+                       f' {names.CONFIG_FILE_PATH}. Overwrite? (y/N): ')
 
         if answer in ['y', 'Y']:
             config_path = init_config(db_path)
-            print('Config file created at {config_path}')
+            print(f'Config file created at {config_path}')
         else:
             print('Keeping old config file')
 

@@ -16,7 +16,7 @@ def main():
         print(exception)
         return
 
-    if needs_init():
+    if command != 'init' and needs_init():
         answer = input('Missing getman files detected. Run initialization?'
                        ' (Will ask before deleting or overwriting files).'
                        ' (y/N): ')
