@@ -22,7 +22,7 @@ def main():
                        ' (y/N): ')
 
         if answer in ['y', 'Y']:
-            init_getman() # TODO: add --force flag for init
+            init_getman()
 
         if needs_init():
             print('Missing required files. Exiting. Nothing has been done.')
@@ -40,7 +40,7 @@ def main():
         elif command == 'list':
             command_handlers.list()
         elif command == 'init':
-            command_handlers.init()
+            command_handlers.init(args.purge)
     except Exception as exception: # TODO: HANDE THIS PROPERLY
         print('ERROR:', exception)
 

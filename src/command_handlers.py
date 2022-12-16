@@ -187,7 +187,7 @@ def list(db_name=None):
         install_filename = package_metadata['install_filename']
         print(install_filename)
 
-def init(purge=False):
+def init(purge):
     if not init_getman.needs_init():
         answer = input('All getman files already exist. Run initialization'
                        ' anyways? (Will ask before overwriting files). (Y/n): ')
@@ -202,11 +202,11 @@ def init(purge=False):
         print(names.DATA_DIR_PATH)
         print(names.CONFIG_DIR_PATH, '\n')
 
-        answer = input('Type DELETE to proceed:')
+        answer = input('Type DELETE to proceed: ')
 
         if answer in ['DELETE']:
             init_getman.delete_everything()
-            print('getman directories deleted.\n')
+            print('All getman directories deleted.\n')
         else:
             print('Exiting. Nothing has been deleted. Nothing has been done.')
             return

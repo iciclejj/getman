@@ -6,8 +6,6 @@ import filenames as names
 from database import init_db
 from config import init_config
 
-# TODO: check for both config and db, and let user decide
-#               whether to do a full reset
 def init_getman():
     print('Initializing getman files and directories in:')
     print(names.DATA_DIR_PATH)
