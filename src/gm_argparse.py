@@ -20,9 +20,13 @@ def init_parser():
     #       I think should be able to implement the commands into the parser
     if command == 'install':
         parser.prog += ' install'
-        parser.add_argument('url', help='URL from where to download the deb package')
+        parser.add_argument('url',
+                            help='URL from where to download the deb package.'
+                                 ' This will be the database entry for the package.')
         parser.add_argument('-n', '--name', '--as',
                             help='Provide a custom name for the installed program')
+        parser.add_argument('-f', '--force', action='store_true',
+                            help='Force install even if package already exists in database')
     elif command == 'uninstall':
         parser.prog += ' uninstall'
         parser.add_argument('package',

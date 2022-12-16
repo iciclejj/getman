@@ -29,7 +29,7 @@ SUPPORTED_FILETYPES = ['application/x-pie-executable']
 #       auto-detect system/architecture
 #       auto-detect site-specific preferred download urls (for example from git repo)
 #       use api when supported (for example api.github.com)
-def install(url, install_filename, force=False, db_name=None):
+def install(url, install_filename, force, db_name=None):
     db_dict = db.get_db_dict(db_name)
     
     # download file and metadata
