@@ -180,7 +180,7 @@ def uninstall(package, is_url, db_name=None):
     print('Package entry removed...')
     print('Package uninstalled.')
 
-def list(db_name=None):
+def list_(db_name=None):
     packages = db.get_db_dict(db_name)['packages']
 
     for url, package_metadata in packages.items():
