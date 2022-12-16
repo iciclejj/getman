@@ -15,7 +15,7 @@ def main():
         return
 
     if needs_init():
-        init_getman()
+        init_getman() # TODO: add --force flag for init
 
     try:
         if command == 'install':

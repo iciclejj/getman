@@ -5,6 +5,7 @@ import filenames as names
 from database import init_db
 from config import init_config
 
+# TODO: check for both config and db, and let user decide whether to do a full reset
 def init_getman():
     print('Initializing getman files and directories in:')
     print(names.DATA_DIR_PATH)
@@ -24,10 +25,17 @@ def init_getman():
 
     print('getman initialized.')
 
-# TODO: check for both config and db, and let user decide whether to do a full reset
 def needs_init():
     if not os.path.isfile(names.CONFIG_FILE_PATH):
         return True
+
+    with open(names.CONFIG_FILE_PATH) as config_file:
+        db_path = json.loads(config_file)['db_path']
+
+    if not os.path.isfile(db_path):
+        return True
+
+    return False
 
 def delete_everything():
     shutil.rmtree(names.CONFIG_DIR_PATH)
