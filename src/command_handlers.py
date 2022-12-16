@@ -29,7 +29,7 @@ SUPPORTED_FILETYPES = ['application/x-pie-executable']
 #       auto-detect system/architecture
 #       auto-detect site-specific preferred download urls (for example from git repo)
 #       use api when supported (for example api.github.com)
-def install(url, force=False, db_name=None):
+def install(url, install_filename, force=False, db_name=None):
     db_dict = db.get_db_dict(db_name)
     
     # download file and metadata
@@ -39,8 +39,10 @@ def install(url, force=False, db_name=None):
     content_type_first = headers['content-type'].partition('/')[0]
 
     # TODO: make listing of filename nicer (currently shows download_filename)
+    #       resolve new install_filename for same url when force == True
     if not force and url in db_dict['packages']:
-        print(f'{download_filename} already in database')
+        install_filename_curr = db_dict['packages'][url]['install_filename']
+        print(f'Package already in database as {install_filename_curr}')
         return
 
     # a bit useless in its current state
@@ -52,9 +54,11 @@ def install(url, force=False, db_name=None):
 
     # install file
     filetype = magic.from_file(download_path, mime=True)
-    install_filename_stem = pathlib.Path(download_path).stem
 
-    install_path = os.path.join(names.INSTALL_DIR_PATH, install_filename_stem)
+    if install_filename is None:
+        install_filename = pathlib.Path(download_path).stem
+
+    install_path = os.path.join(names.INSTALL_DIR_PATH, install_filename)
 
     # TODO: maybe make a general error handler for the install command
     if filetype not in SUPPORTED_FILETYPES:
@@ -78,7 +82,7 @@ def install(url, force=False, db_name=None):
     db_dict['packages'][url] = {
             'created_at': str(datetime.now()),
             'updated_at': str(datetime.now()),
-            'install_filename': install_filename_stem,
+            'install_filename': install_filename,
             'install_path': install_path,
             'download_filename': download_filename,
             'md5_base64': content_md5,
@@ -86,7 +90,7 @@ def install(url, force=False, db_name=None):
 
     db.overwrite_db(db_name, db_dict)
 
-    print(f'{install_filename_stem} successfully installed to {install_path}')
+    print(f'{install_filename} successfully installed to {install_path}')
 
 def update(db_name=None):
     db_dict = db.get_db_dict(db_name)

@@ -17,16 +17,20 @@ def init_parser():
         raise ValueError(f'Unrecognized command. Available commands: {LEGAL_COMMANDS}')
 
     # TODO: package command-specific parser modifications into their own functions
+    #       I think should be able to implement the commands into the parser
     if command == 'install':
         parser.prog += ' install'
         parser.add_argument('url', help='URL from where to download the deb package')
+        parser.add_argument('-n', '--name', '--as',
+                            help='Provide a custom name for the installed program')
     elif command == 'uninstall':
         parser.prog += ' uninstall'
-        parser.add_argument('package', help='Filename (command) of the package you wish'
-                                            ' to upgrade. Source URL can be supplied'
-                                            ' instead with -u or --url')
-        parser.add_argument('-u', '--url', help='Provide URL instead of filename/command',
-                            action='store_true')
+        parser.add_argument('package',
+                            help='Filename (command) of the package you wish'
+                                 ' to upgrade. Source URL can be supplied'
+                                 ' instead with -u or --url')
+        parser.add_argument('-u', '--url', action='store_true',
+                            help='Provide URL instead of filename/command')
     elif command == 'update':
         parser.prog += ' update'
     elif command == 'upgrade':
