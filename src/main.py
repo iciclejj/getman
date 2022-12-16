@@ -1,23 +1,17 @@
-import argparse
 import sys
 
 import command_handlers
 import database as db
-from gm_argparse import init_parser
+from gm_argparse import create_parser
 from init_getman import init_getman, needs_init
 import filenames as names
 
-# TODO: add check for residual download files
-#       ADD COMMANDLINE AUTOCOMPLETE !!!
-
-# TODO PRIORITY: command_handlers 92, 118, 139
-
 def main():
-    try:
-        command, args, parser = init_parser()
-    except Exception as exception:
-        print(exception)
-        return
+    # Parse the command-line arguments
+    args = create_parser()
+
+    # Extract the command from the args namespace
+    command = args.command
 
     if command != 'init' and needs_init():
         answer = input('Missing getman files detected. Run initialization?'
