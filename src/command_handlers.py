@@ -35,7 +35,8 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 #       auto-detect system/architecture
 #       auto-detect site-specific preferred download urls (for example from git repo)
 #       use api when supported (for example api.github.com)
-def install(url, install_filename, force, db_name=None):
+def install_(url, install_filename=None, force=False, db_name=None,
+             command=None):
     db_dict = db.get_db_dict(db_name)
     
     # download file and metadata
@@ -110,7 +111,7 @@ def install(url, install_filename, force, db_name=None):
 
     print(f'{install_filename} successfully installed to {install_path}')
 
-def update(db_name=None):
+def update_(db_name=None, command=None):
     db_dict = db.get_db_dict(db_name)
 
     for url, package_metadata in db_dict['packages'].items():
@@ -131,7 +132,7 @@ def update(db_name=None):
 
     print(f'Update successful. Upgradeable packages: {n_upgradeable}')
 
-def upgrade(db_name=None):
+def upgrade_(db_name=None, command=None):
     upgradeable = db.get_db_dict(db_name)['upgradeable']
 
     n_upgraded = 0
@@ -157,7 +158,7 @@ def upgrade(db_name=None):
     else:
         print(f'Nothing to upgrade.')
 
-def uninstall(package, is_url, db_name=None):
+def uninstall_(package, is_url, db_name=None, command=None):
     if is_url:
         url = package
     else:
@@ -182,14 +183,14 @@ def uninstall(package, is_url, db_name=None):
     print('Package entry removed...')
     print('Package uninstalled.')
 
-def list_(db_name=None):
+def list_(db_name=None, command=None):
     packages = db.get_db_dict(db_name)['packages']
 
     for url, package_metadata in packages.items():
         install_filename = package_metadata['install_filename']
         print(install_filename)
 
-def init(purge):
+def init_(purge, command=None):
     if not init_getman.needs_init():
         answer = input('All getman files already exist. Run initialization'
                        ' anyways? (Will ask before overwriting files). (Y/n): ')
