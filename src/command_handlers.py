@@ -8,9 +8,13 @@ import pathlib
 import stat # for chmod +x
 from base64 import b64encode
 from datetime import datetime
+import ssl # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
+
+
 
 # pip libraries
 import magic
+import certifi # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
 
 # local modules
 import filenames as names
@@ -22,6 +26,10 @@ import init_getman
 
 SUPPORTED_CONTENT_TYPE_FIRSTS = ['application'] # must use startswith (after '/' is excluded)
 SUPPORTED_FILETYPES = ['application/x-pie-executable']
+
+# fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
+SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
+ssl._create_default_https_context = lambda: SSL_CONTEXT
 
 # TODO: add commandline arg for 'force'
 #
@@ -38,12 +46,24 @@ def install(url, install_filename, force, db_name=None):
     download_filename = headers.get_filename()
     content_type_first = headers['content-type'].partition('/')[0]
 
+    # TODO_: maybe turn return into exception
+    if download_filename is None:
+        if install_filename is None:
+            print('Could not determine download filename.'
+                  ' Please provide custom name with --name')
+            return
+
+        download_filename = install_filename
+        print('NB: could not determine download_filename.'
+              ' Using provided custom program name.')
+
     # TODO: make listing of filename nicer (currently shows download_filename)
     #       resolve new install_filename for same url when force == True
     if not force and url in db_dict['packages']:
         install_filename_curr = db_dict['packages'][url]['install_filename']
         print(f'Package already in database as {install_filename_curr}')
         return
+
 
     # a bit useless in its current state
     if content_type_first not in SUPPORTED_CONTENT_TYPE_FIRSTS:
