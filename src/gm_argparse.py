@@ -21,7 +21,7 @@ def init_parser():
     if command == 'install':
         parser.prog += ' install'
         parser.add_argument('url',
-                            help='URL from where to download the deb package.'
+                            help='URL from where to download the binary.'
                                  ' This will be the database entry for the package.')
         parser.add_argument('-n', '--name', '--as',
                             help='Provide a custom name for the installed program')
