@@ -187,24 +187,31 @@ def list(db_name=None):
         install_filename = package_metadata['install_filename']
         print(install_filename)
 
-def init():
+def init(purge=False):
     if not init_getman.needs_init():
-        print('getman already initialized. Type "DELETE" and press Enter to delete all'
-              ' getman directories and re-run initialization.\n')
+        answer = input('All getman files already exist. Run initialization'
+                       ' anyways? (Will ask before overwriting files). (Y/n): ')
 
-        print('directories that will be deleted:')
+        if answer not in ['y', 'Y', '']:
+            print('Initialization cancelled. Nothing has been done.')
+            return
+
+    if purge:
+        print('Requested purge. Directories that will be deleted before running'
+              ' initialization:')
         print(names.DATA_DIR_PATH)
         print(names.CONFIG_DIR_PATH, '\n')
 
-        user_input = input()
-        print()
+        answer = input('Type DELETE to proceed:')
 
-        if user_input == 'DELETE':
-            print('Deleting...')
+        if answer in ['DELETE']:
             init_getman.delete_everything()
-            init_getman.init_getman()
+            print('getman directories deleted.\n')
         else:
-            print('Exiting. Nothing was deleted.')
+            print('Exiting. Nothing has been deleted. Nothing has been done.')
+            return
+
+    init_getman.init_getman()
 
 def _get_base64_md5(file_path):
     file_hash = hashlib.md5()

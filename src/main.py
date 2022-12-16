@@ -7,6 +7,8 @@ from gm_argparse import init_parser
 from init_getman import init_getman, needs_init
 import filenames as names
 
+# TODO: add check for residual download files
+
 def main():
     try:
         command, args, parser = init_parser()
@@ -15,7 +17,16 @@ def main():
         return
 
     if needs_init():
-        init_getman() # TODO: add --force flag for init
+        answer = input('Missing getman files detected. Run initialization?'
+                       ' (Will ask before deleting or overwriting files).'
+                       ' (y/N): ')
+
+        if answer in ['y', 'Y']:
+            init_getman() # TODO: add --force flag for init
+
+        if needs_init():
+            print('Missing required files. Exiting. Nothing has been done.')
+            return
 
     try:
         if command == 'install':
@@ -30,7 +41,7 @@ def main():
             command_handlers.list()
         elif command == 'init':
             command_handlers.init()
-    except Exception as exception:
+    except Exception as exception: # TODO: HANDE THIS PROPERLY
         print('ERROR:', exception)
 
 if __name__ == '__main__':
