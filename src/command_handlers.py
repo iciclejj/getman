@@ -15,7 +15,7 @@ import magic
 import certifi # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
 
 # local modules
-import filenames as names
+import constants as names
 import database as db
 import config
 import init_getman

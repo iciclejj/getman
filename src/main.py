@@ -4,7 +4,7 @@ import command_handlers
 import database as db
 from gm_argparse import create_parser
 from init_getman import init_getman, needs_init
-import filenames as names
+import constants as names
 
 def main():
     # Parse the command-line arguments

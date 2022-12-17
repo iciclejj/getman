@@ -2,7 +2,7 @@ import json
 import os
 import shutil # for rm -r
 
-import filenames as names
+import constants as names
 from database import init_db
 from config import init_config
 

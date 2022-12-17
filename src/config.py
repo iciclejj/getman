@@ -1,7 +1,7 @@
 import json
 import os
 
-import filenames as names
+import constants as names
 
 def init_config(db_path):
     config_path = names.CONFIG_FILE_PATH
