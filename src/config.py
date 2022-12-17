@@ -3,26 +3,24 @@ import os
 
 from constants import (
         FILE_PATH_CONFIG,
-        FILE_PATH_DB_DEFAULT,
+        FILE_PATH_DB,
         )
 
-def init_config(db_path):
-    config_path = FILE_PATH_CONFIG
-
+def init_config():
     config_dict = {
-            'db_path': db_path
     }
 
     config_json = json.dumps(config_dict)
 
-    with open(config_path, 'w+') as file:
+    with open(FILE_PATH_CONFIG, 'w+') as file:
         file.write(config_json)
 
-    return config_path
+    return FILE_PATH_CONFIG
 
 def get_config():
     with open(FILE_PATH_CONFIG) as config_file:
         config_dict = json.loads(config_file.read())
+
     return config_dict
 
 if __name__ == '__main__':
@@ -31,7 +29,7 @@ if __name__ == '__main__':
         config_dict = get_config()
     else:
         print(f'{FILE_PATH_CONFIG} does not exist. Running init_config then deleting file.\n')
-        config_path = init_config(FILE_PATH_DB_DEFAULT)
+        config_path = init_config(FILE_PATH_DB)
         config_dict = get_config()
         os.remove(config_path)
 

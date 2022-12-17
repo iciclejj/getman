@@ -1,14 +1,11 @@
-import json
 import os
 import shutil # for rm -r
 
 from constants import (
         DIR_PATH_CONFIG,
         DIR_PATH_DATA,
-        DIR_PATH_PACKAGES_DEFAULT,
-        DIR_PATH_DATA,
-        DIR_PATH_CONFIG,
-        FILE_PATH_DB_DEFAULT,
+        DIR_PATH_PACKAGES,
+        FILE_PATH_DB,
         FILE_PATH_CONFIG,
         )
 
@@ -26,35 +23,33 @@ def init_getman():
     if not os.path.isdir(DIR_PATH_CONFIG):
         os.makedirs(DIR_PATH_CONFIG)
 
-    if not os.path.isdir(DIR_PATH_PACKAGES_DEFAULT):
-        os.makedirs(DIR_PATH_PACKAGES_DEFAULT)
-
-    db_path = FILE_PATH_DB_DEFAULT
+    if not os.path.isdir(DIR_PATH_PACKAGES):
+        os.makedirs(DIR_PATH_PACKAGES)
 
     # feel like there's a way to clean this up
-    if not os.path.isfile(db_path):
-        db_path = init_db()
-        print(f'Database file created at {db_path}')
+    if not os.path.isfile(FILE_PATH_DB):
+        init_db()
+        print(f'Database file created at {FILE_PATH_DB}')
     else:
-        answer = input(f'Default database file already exists at {db_path}.'
+        answer = input(f'Default database file already exists at {FILE_PATH_DB}.'
                        f' Overwrite? (y/N): ')
 
         if answer in ['y', 'Y']:
-            db_path = init_db()
-            print(f'Database file created at {db_path}')
+            init_db()
+            print(f'Database file created at {FILE_PATH_DB}')
         else:
             print('Keeping old database file.')
 
     # feel like there's a way to clean this up
     if not os.path.isfile(FILE_PATH_CONFIG):
-        config_path = init_config(db_path)
+        config_path = init_config()
         print(f'Config file created at {config_path}')
     else:
         answer = input(f'Config file already exists as'
                        f' {FILE_PATH_CONFIG}. Overwrite? (y/N): ')
 
         if answer in ['y', 'Y']:
-            config_path = init_config(db_path)
+            config_path = init_config()
             print(f'Config file created at {config_path}')
         else:
             print('Keeping old config file')
@@ -62,14 +57,19 @@ def init_getman():
     print('getman initialization completed.')
 
 def needs_init():
+    if not os.path.isdir(DIR_PATH_DATA):
+        return True
+
+    if not os.path.isdir(DIR_PATH_CONFIG):
+        return True
+
+    if not os.path.isdir(DIR_PATH_PACKAGES):
+        return True
+
     if not os.path.isfile(FILE_PATH_CONFIG):
         return True
 
-    with open(FILE_PATH_CONFIG) as config_file:
-        db_dict = json.loads(config_file.read())
-        db_path = db_dict['db_path']
-
-    if not os.path.isfile(db_path):
+    if not os.path.isfile(FILE_PATH_DB):
         return True
 
     return False

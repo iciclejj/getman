@@ -1,8 +1,6 @@
 # python standard libraries
 import hashlib
-import json
 import os
-import subprocess
 import urllib.request
 import pathlib
 import stat # for chmod +x
@@ -15,16 +13,14 @@ import magic
 import certifi # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
 
 # local modules
-import constants as names
 from constants import (
         DIR_PATH_INSTALL,
         DIR_PATH_DATA,
         DIR_PATH_CONFIG,
-        DIR_PATH_PACKAGES_DEFAULT,
+        DIR_PATH_PACKAGES,
         )
 
 import database as db
-import config
 import init_getman
 
 # TODO: create separate .py files for each command and turn this into an "interface" file
@@ -36,16 +32,15 @@ SUPPORTED_FILETYPES = ['application/x-pie-executable']
 SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 ssl._create_default_https_context = lambda: SSL_CONTEXT
 
-# TODO: 
+# TODO:
 #
 #       EXPERIMENTAL TODOS:
 #       auto-detect system/architecture
 #       auto-detect site-specific preferred download urls (for example from git repo)
 #       use api when supported (for example api.github.com)
-def install_(url, install_filename=None, force=False, db_name=None,
-             command=None):
-    db_dict = db.get_db_dict(db_name)
-    
+def install_(url, install_filename=None, force=False, command=None):
+    db_dict = db.get_db_dict()
+
     # download file and metadata
     headers = _get_headers(url) # headers is an EmailMessage => returns None if key not found
 
@@ -75,7 +70,7 @@ def install_(url, install_filename=None, force=False, db_name=None,
         print('Warning: could not determine if correct filetype before downloading.'
               ' Will check again after download.') # TODO: proper warning
 
-    download_path = os.path.join(DIR_PATH_PACKAGES_DEFAULT, download_filename)
+    download_path = os.path.join(DIR_PATH_PACKAGES, download_filename)
     urllib.request.urlretrieve(url, filename=download_path) # downloads file to download_path
 
     # install file
@@ -95,7 +90,9 @@ def install_(url, install_filename=None, force=False, db_name=None,
     try:
         if filetype == 'application/x-pie-executable':
             file_st = os.stat(download_path)
-            os.chmod(download_path, file_st.st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+            plus_x_mode = (file_st.st_mode | stat.S_IXUSR | stat.S_IXGRP
+                           | stat.S_IXOTH)
+            os.chmod(download_path, plus_x_mode)
             os.replace(download_path, install_path)
     except Exception  as e: # TODO: HANDLE THIS PROPERLY !!!
         os.remove(download_path)
@@ -114,16 +111,17 @@ def install_(url, install_filename=None, force=False, db_name=None,
             'md5_base64': content_md5,
     }
 
-    db.overwrite_db(db_name, db_dict)
+    db.overwrite_db(db_dict)
 
     print(f'{install_filename} successfully installed to {install_path}')
 
-def update_(db_name=None, command=None):
-    db_dict = db.get_db_dict(db_name)
+def update_(command=None):
+    db_dict = db.get_db_dict()
 
     for url, package_metadata in db_dict['packages'].items():
         headers = _get_headers(url)
-        content_md5 = headers['content-md5'] # TODO: maybe rename content_md5 to md5_base64 (everywhere)
+        # TODO: maybe rename content_md5 to md5_base64 (everywhere)
+        content_md5 = headers['content-md5']
 
         if content_md5 is None:
             print('Warning: not something isn\'t implemented yet, skipping package Xd')
@@ -132,66 +130,66 @@ def update_(db_name=None, command=None):
         if content_md5 != package_metadata['md5_base64']:
             db_dict['upgradeable'][url] = {}
 
-    db.overwrite_db(db_name, db_dict)
+    db.overwrite_db(db_dict)
 
-    upgradeable = db.get_db_dict(db_name)['upgradeable']
+    upgradeable = db.get_db_dict()['upgradeable']
     n_upgradeable = len(upgradeable)
 
     print(f'Update successful. Upgradeable packages: {n_upgradeable}')
 
-def upgrade_(db_name=None, command=None):
-    upgradeable = db.get_db_dict(db_name)['upgradeable']
+def upgrade_(command=None):
+    upgradeable = db.get_db_dict()['upgradeable']
 
     n_upgraded = 0
 
     # TODO: try/except
     #       show total GB before upgrade (in install too)
     #       progress bar (in install too)
+    #       probably make a separate upgrade uninstaller
     for url in list(upgradeable.keys()): # list to allow delete as we go
-        install_filename = db.get_package_attribute(db_name, url,
-                                                    'install_filename')
-        install(url, install_filename, force=True) # TODO: probably make a separate upgrade installer
+        install_filename = db.get_package_attribute(url, 'install_filename')
+        install(url, install_filename, force=True)
         del upgradeable[url]
         n_upgraded += 1
 
     # reload db_dict after modification by install (REMOVE IF IMPLEMENTING INDEPENDENT UPGRADER)
-    db_dict = db.get_db_dict(db_name)
+    db_dict = db.get_db_dict()
     db_dict['upgradeable'] = upgradeable
 
-    db.overwrite_db(db_name, db_dict)
+    db.overwrite_db(db_dict)
 
     if n_upgraded > 0:
         print(f'Upgrade successful. Upgraded packages: {n_upgraded}')
     else:
         print(f'Nothing to upgrade.')
 
-def uninstall_(package, is_url, db_name=None, command=None):
+def uninstall_(package, is_url, command=None):
     if is_url:
         url = package
     else:
-        url = db.get_url_from_install_filename(db_name, package)
+        url = db.get_url_from_install_filename(package)
 
     # make sure package exists
-    if url is None or not db.is_package_url(db_name, url):
+    if url is None or not db.is_package_url(url):
         print('Package not found in database.')
         return
 
     # assume it exists from here on
-    install_path = db.get_package_attribute(db_name, url, 'install_path')
+    install_path = db.get_package_attribute(url, 'install_path')
 
     try:
         os.remove(install_path)
         print('Program removed...')
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         print('Program not found in install path, skipping...')
 
-    db.remove_package_entry(db_name, url)
+    db.remove_package_entry(url)
 
     print('Package entry removed...')
     print('Package uninstalled.')
 
-def list_(db_name=None, command=None):
-    packages = db.get_db_dict(db_name)['packages']
+def list_(command=None):
+    packages = db.get_db_dict()['packages']
 
     for url, package_metadata in packages.items():
         install_filename = package_metadata['install_filename']
@@ -231,25 +229,26 @@ def _get_base64_md5(file_path):
         while chunk:
             file_hash.update(chunk)
             chunk = file.read(8192)
-    
+
     b64_hash = b64encode(file_hash.digest()).decode()
 
     return b64_hash
 
 def _get_headers(url):
     request = urllib.request.Request(url, method='HEAD')
-    response = urllib.request.urlopen(request)
 
-    return response.headers
+    with urllib.request.urlopen(request) as response:
+        return response.headers
 
 if __name__ == '__main__':
-    url = 'https://github.com/ThePBone/GalaxyBudsClient/releases/download/4.5.2/GalaxyBudsClient_Linux_64bit_Portable.bin'
+    url = ('https://github.com/ThePBone/GalaxyBudsClient/releases/download'
+           '/4.5.2/GalaxyBudsClient_Linux_64bit_Portable.bin')
 
     headers = _get_headers(url)
 
     download_filename = headers.get_filename() + '.test'
 
-    download_filepath = os.path.join(DIR_PATH_PACKAGES_DEFAULT, download_filename)
+    download_filepath = os.path.join(DIR_PATH_PACKAGES, download_filename)
     urllib.request.urlretrieve(url, filename=download_filepath)
 
     print(f'download_filepath: {download_filepath}')
