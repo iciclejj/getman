@@ -17,8 +17,8 @@ def init_getman():
     if not os.path.isdir(names.CONFIG_DIR_PATH):
         os.makedirs(names.CONFIG_DIR_PATH)
 
-    if not os.path.isdir(names.DEFAULT_DEB_PACKAGE_DIR_PATH):
-        os.makedirs(names.DEFAULT_DEB_PACKAGE_DIR_PATH)
+    if not os.path.isdir(names.DEFAULT_PACKAGE_DIR_PATH):
+        os.makedirs(names.DEFAULT_PACKAGE_DIR_PATH)
 
     db_path = names.DEFAULT_DB_FILE_PATH
 

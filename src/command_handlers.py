@@ -68,7 +68,7 @@ def install_(url, install_filename=None, force=False, db_name=None,
         print('Warning: could not determine if correct filetype before downloading.'
               ' Will check again after download.') # TODO: proper warning
 
-    download_path = os.path.join(names.DEFAULT_DEB_PACKAGE_DIR_PATH, download_filename)
+    download_path = os.path.join(names.DEFAULT_PACKAGE_DIR_PATH, download_filename)
     urllib.request.urlretrieve(url, filename=download_path) # downloads file to download_path
 
     # install file
@@ -242,7 +242,7 @@ if __name__ == '__main__':
 
     download_filename = headers.get_filename() + '.test'
 
-    download_filepath = os.path.join(names.DEFAULT_DEB_PACKAGE_DIR_PATH, download_filename)
+    download_filepath = os.path.join(names.DEFAULT_PACKAGE_DIR_PATH, download_filename)
     urllib.request.urlretrieve(url, filename=download_filepath)
 
     print(f'download_filepath: {download_filepath}')
