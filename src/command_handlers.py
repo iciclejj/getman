@@ -16,6 +16,13 @@ import certifi # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
 
 # local modules
 import constants as names
+from constants import (
+        DIR_PATH_INSTALL,
+        DIR_PATH_DATA,
+        DIR_PATH_CONFIG,
+        DIR_PATH_PACKAGES_DEFAULT,
+        )
+
 import database as db
 import config
 import init_getman
@@ -68,7 +75,7 @@ def install_(url, install_filename=None, force=False, db_name=None,
         print('Warning: could not determine if correct filetype before downloading.'
               ' Will check again after download.') # TODO: proper warning
 
-    download_path = os.path.join(names.DEFAULT_PACKAGE_DIR_PATH, download_filename)
+    download_path = os.path.join(DIR_PATH_PACKAGES_DEFAULT, download_filename)
     urllib.request.urlretrieve(url, filename=download_path) # downloads file to download_path
 
     # install file
@@ -77,7 +84,7 @@ def install_(url, install_filename=None, force=False, db_name=None,
     if install_filename is None:
         install_filename = pathlib.Path(download_path).stem
 
-    install_path = os.path.join(names.INSTALL_DIR_PATH, install_filename)
+    install_path = os.path.join(DIR_PATH_INSTALL, install_filename)
 
     # TODO: maybe make a general error handler for the install command
     if filetype not in SUPPORTED_FILETYPES:
@@ -202,8 +209,8 @@ def init_(purge, command=None):
     if purge:
         print('Requested purge. Directories that will be deleted before running'
               ' initialization:')
-        print(names.DATA_DIR_PATH)
-        print(names.CONFIG_DIR_PATH, '\n')
+        print(DIR_PATH_DATA)
+        print(DIR_PATH_CONFIG, '\n')
 
         answer = input('Type DELETE to proceed: ')
 
@@ -242,7 +249,7 @@ if __name__ == '__main__':
 
     download_filename = headers.get_filename() + '.test'
 
-    download_filepath = os.path.join(names.DEFAULT_PACKAGE_DIR_PATH, download_filename)
+    download_filepath = os.path.join(DIR_PATH_PACKAGES_DEFAULT, download_filename)
     urllib.request.urlretrieve(url, filename=download_filepath)
 
     print(f'download_filepath: {download_filepath}')
@@ -256,4 +263,3 @@ if __name__ == '__main__':
         os.remove(download_filepath)
     else:
         print(f'ERROR:\n{download_filepath} was not created.')
-

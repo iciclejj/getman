@@ -1,30 +1,37 @@
 import os
 
-CONFIG_FILE_NAME = 'config.json'
-CONFIG_DIR_PATH = os.path.expanduser('~/.config/getman')
-CONFIG_FILE_PATH = os.path.join(CONFIG_DIR_PATH, CONFIG_FILE_NAME)
+# DIRECTORIES
 
-DATA_DIR_PATH = os.path.expanduser('~/.local/share/getman')
+DIR_PATH_DATA = os.path.expanduser('~/.local/share/getman')
 
-DEFAULT_DB_FILE_NAME = 'default_database.json'
-DB_DIR_NAME = 'databases'
-DB_DIR_PATH = os.path.join(DATA_DIR_PATH, DB_DIR_NAME)
-DEFAULT_DB_FILE_PATH = os.path.join(DB_DIR_PATH, DEFAULT_DB_FILE_NAME)
+DIR_PATH_INSTALL = os.path.expanduser('~/.local/bin')
 
-DEFAULT_PACKAGE_DIR_NAME = 'packages'
-DEFAULT_PACKAGE_DIR_PATH = os.path.join(DATA_DIR_PATH, DEFAULT_PACKAGE_DIR_NAME)
+DIR_NAME_DB = 'databases'
+DIR_PATH_DB = os.path.join(DIR_PATH_DATA, DIR_NAME_DB)
 
-INSTALL_DIR_PATH = os.path.expanduser('~/.local/bin')
+DIR_NAME_PACKAGES_DEFAULT = 'packages'
+DIR_PATH_PACKAGES_DEFAULT = os.path.join(DIR_PATH_DATA, DIR_NAME_PACKAGES_DEFAULT)
+
+DIR_PATH_CONFIG = os.path.expanduser('~/.config/getman')
+
+# FILES
+
+FILE_NAME_DB_DEFAULT = 'default_database.json'
+FILE_PATH_DB_DEFAULT = os.path.join(DIR_PATH_DB, FILE_NAME_DB_DEFAULT)
+
+FILE_NAME_CONFIG = 'config.json'
+FILE_PATH_CONFIG = os.path.join(DIR_PATH_CONFIG, FILE_NAME_CONFIG)
 
 if __name__ == '__main__':
-    print(f'CONFIG_FILE_NAME: {CONFIG_FILE_NAME}')
-    print(f'CONFIG_DIR_PATH: {CONFIG_DIR_PATH}')
-    print(f'CONFIG_FILE_PATH: {CONFIG_FILE_PATH}')
-    print(f'DATA_DIR_PATH: {DATA_DIR_PATH}')
-    print(f'DEFAULT_DB_FILE_NAME: {DEFAULT_DB_FILE_NAME}')
-    print(f'DB_DIR_NAME: {DB_DIR_NAME}')
-    print(f'DB_DIR_PATH: {DB_DIR_PATH}')
-    print(f'DEFAULT_DB_FILE_PATH: {DEFAULT_DB_FILE_PATH}')
-    print(f'DEFAULT_PACKAGE_DIR_NAME: {DEFAULT_PACKAGE_DIR_NAME}')
-    print(f'DEFAULT_PACKAGE_DIR_PATH: {DEFAULT_PACKAGE_DIR_PATH}')
-    print(f'INSTALL_DIR_PATH: {INSTALL_DIR_PATH}')
+    print('DIR_PATH_DATA: {DIR_PATH_DATA}')
+    print('DIR_PATH_INSTALL: {DIR_PATH_INSTALL}')
+    print('DIR_NAME_DB: {DIR_NAME_DB}')
+    print('DIR_PATH_DB: {DIR_PATH_DB}')
+    print('DIR_NAME_PACKAGES_DEFAULT: {DIR_NAME_PACKAGES_DEFAULT}')
+    print('DIR_PATH_PACKAGES_DEFAULT: {DIR_PATH_PACKAGES_DEFAULT}')
+    print('DIR_PATH_CONFIG: {DIR_PATH_CONFIG}')
+
+    print('FILE_NAME_DB_DEFAULT: {FILE_NAME_DB_DEFAULT}')
+    print('FILE_PATH_DB_DEFAULT: {FILE_PATH_DB_DEFAULT}')
+    print('FILE_NAME_CONFIG: {FILE_NAME_CONFIG}')
+    print('FILE_PATH_CONFIG: {FILE_PATH_CONFIG}')

@@ -2,7 +2,10 @@ from datetime import datetime
 import json
 import os
 
-import constants as names
+from constants import (
+        FILE_NAME_DB_DEFAULT,
+        DIR_PATH_DB,
+        )
 
 # for testing
 import secrets
@@ -10,12 +13,12 @@ import secrets
 # TODO: TURN THIS SHIT INTO A CLASS !!!!!!!!!!!!!!!!!!!!!!!!
 def init_db(db_name=None, overwrite=True):
     if db_name is None:
-        db_name = names.DEFAULT_DB_FILE_NAME
+        db_name = FILE_NAME_DB_DEFAULT
 
-    if not os.path.isdir(names.DB_DIR_PATH):
-        os.mkdir(names.DB_DIR_PATH)
+    if not os.path.isdir(DIR_PATH_DB):
+        os.mkdir(DIR_PATH_DB)
 
-    db_path = os.path.join(names.DB_DIR_PATH, db_name)
+    db_path = os.path.join(DIR_PATH_DB, db_name)
 
     db_dict = {
             'created_at': str(datetime.now()),
@@ -33,9 +36,9 @@ def get_db_dict(db_name=None):
     #                (possibly remove custom db altogether) 
     #       use get_config to db name when None
     if db_name is None:
-        db_name = names.DEFAULT_DB_FILE_NAME
+        db_name = FILE_NAME_DB_DEFAULT
 
-    db_path = os.path.join(names.DB_DIR_PATH, db_name)
+    db_path = os.path.join(DIR_PATH_DB, db_name)
 
     with open(db_path, 'r') as db_file:
         db_dict = json.loads(db_file.read())
@@ -46,9 +49,9 @@ def get_db_dict(db_name=None):
 #               (do this everywhere)
 def overwrite_db(db_name, db_dict):
     if db_name is None:
-        db_name = names.DEFAULT_DB_FILE_NAME
+        db_name = FILE_NAME_DB_DEFAULT
 
-    db_path = os.path.join(names.DB_DIR_PATH, db_name)
+    db_path = os.path.join(DIR_PATH_DB, db_name)
     db_json = json.dumps(db_dict)
 
     # TODO: add try/except
