@@ -1,6 +1,10 @@
-import os
+# built-in libraries
+from os import makedirs
+from os.path import isdir, isfile
 import shutil # for rm -r
 
+# getman modules
+from config import init_config
 from constants import (
         DIR_PATH_CONFIG,
         DIR_PATH_DATA,
@@ -8,86 +12,70 @@ from constants import (
         FILE_PATH_DB,
         FILE_PATH_CONFIG,
         )
-
 from database import init_db
-from config import init_config
+
+_GETMAN_REQUIRED_DIR_PATHS = [DIR_PATH_CONFIG, DIR_PATH_DATA, DIR_PATH_PACKAGES]
+_GETMAN_REQUIRED_FILE_PATHS = [FILE_PATH_CONFIG, FILE_PATH_DB]
 
 def init_getman():
-    print('Initializing getman files and directories in:')
-    print(DIR_PATH_DATA)
-    print(DIR_PATH_CONFIG)
+    def _create_dir_if_not_exists(path):
+        if not isdir(path):
+            makedirs(path)
 
-    if not os.path.isdir(DIR_PATH_DATA):
-        os.makedirs(DIR_PATH_DATA)
+    def _create_or_prompt_overwrite_file(path, fn_create_file):
+        if not isfile(path):
+            fn_create_file()
+            print(f'{path} created...')
 
-    if not os.path.isdir(DIR_PATH_CONFIG):
-        os.makedirs(DIR_PATH_CONFIG)
-
-    if not os.path.isdir(DIR_PATH_PACKAGES):
-        os.makedirs(DIR_PATH_PACKAGES)
-
-    # feel like there's a way to clean this up
-    if not os.path.isfile(FILE_PATH_DB):
-        init_db()
-        print(f'Database file created at {FILE_PATH_DB}')
-    else:
-        answer = input(f'Default database file already exists at {FILE_PATH_DB}.'
-                       f' Overwrite? (y/N): ')
+        answer = input(f'{path} already exists. Overwrite? (y/N): ')
 
         if answer in ['y', 'Y']:
-            init_db()
-            print(f'Database file created at {FILE_PATH_DB}')
-        else:
-            print('Keeping old database file.')
+            fn_create_file()
+            print('Overwriting file...')
 
-    # feel like there's a way to clean this up
-    if not os.path.isfile(FILE_PATH_CONFIG):
-        config_path = init_config()
-        print(f'Config file created at {config_path}')
-    else:
-        answer = input(f'Config file already exists as'
-                       f' {FILE_PATH_CONFIG}. Overwrite? (y/N): ')
+        print('Keeping old file...')
 
-        if answer in ['y', 'Y']:
-            config_path = init_config()
-            print(f'Config file created at {config_path}')
-        else:
-            print('Keeping old config file')
+    # print top-level getman directories
+    print('Initializing getman files and directories in:',
+           DIR_PATH_DATA,
+           DIR_PATH_CONFIG,
+           sep='\n'
+          )
+
+    for dir_path in _GETMAN_REQUIRED_DIR_PATHS:
+        _create_dir_if_not_exists(dir_path)
+
+    _create_or_prompt_overwrite_file(FILE_PATH_CONFIG, init_config)
+    _create_or_prompt_overwrite_file(FILE_PATH_DB, init_db)
 
     print('getman initialization completed.')
 
 def needs_init():
-    if not os.path.isdir(DIR_PATH_DATA):
-        return True
+    for dir_path in _GETMAN_REQUIRED_DIR_PATHS:
+        if not isdir(dir_path):
+            return True
 
-    if not os.path.isdir(DIR_PATH_CONFIG):
-        return True
-
-    if not os.path.isdir(DIR_PATH_PACKAGES):
-        return True
-
-    if not os.path.isfile(FILE_PATH_CONFIG):
-        return True
-
-    if not os.path.isfile(FILE_PATH_DB):
-        return True
+    for file_path in _GETMAN_REQUIRED_FILE_PATHS:
+        if not isfile(file_path):
+            return True
 
     return False
 
 def delete_everything():
-    shutil.rmtree(DIR_PATH_CONFIG)
-    shutil.rmtree(DIR_PATH_DATA)
+    for dir_path in _GETMAN_REQUIRED_DIR_PATHS:
+        if isdir(dir_path):
+            shutil.rmtree(dir_path)
 
 # TODO: add check for config files and subdirs
 if __name__ == '__main__':
     init_getman()
 
-    if os.path.isdir(DIR_PATH_CONFIG):
+    if isdir(DIR_PATH_CONFIG):
         print(DIR_PATH_CONFIG, 'directory exists')
     else:
         print('ERROR:', DIR_PATH_CONFIG, 'directory does not exist')
-    
-    if os.path.isdir(DIR_PATH_DATA):
+
+    if isdir(DIR_PATH_DATA):
         print(DIR_PATH_DATA, 'directory exists')
     else:
         print('ERROR:', DIR_PATH_DATA, 'does not exist')
@@ -98,4 +86,4 @@ if __name__ == '__main__':
 
     if user_input == 'DELETE':
         delete_everything()
-        
+
