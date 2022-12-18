@@ -29,7 +29,7 @@ def main():
                        ' (Will ask before deleting or overwriting files).'
                        ' (y/N): ')
 
-        if answer.lower in ['y', 'yes']:
+        if answer.lower() in ['y', 'yes']:
             init_getman()
 
     if needs_init() and args.command != 'init':

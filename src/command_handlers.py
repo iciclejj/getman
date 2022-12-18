@@ -84,7 +84,7 @@ def install_(url, install_filename=None, force=False, command=None):
             install_path_old = os.path.join(DIR_PATH_INSTALL,
                                             install_filename_old)
 
-            if answer.lower in ['n', 'no']:
+            if answer.lower() in ['n', 'no']:
                 print('Keeping old install ({install_path_old})')
             else:
                 try:
@@ -233,7 +233,7 @@ def init_(purge, command=None):
                        ' anyways? (Will ask before overwriting files).'
                        ' (Y/n): ')
 
-        if answer.lower in ['n', 'no']:
+        if answer.lower() in ['n', 'no']:
             print('Initialization cancelled. Nothing has been done.')
             return
 
