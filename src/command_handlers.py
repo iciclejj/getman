@@ -81,12 +81,12 @@ def install_(url, install_filename=None, force=False, command=None):
                             ' Delete old program before re-installing'
                             ' with new name? (Y/n): ')
 
-            install_path_old = os.path.join(DIR_PATH_INSTALL,
-                                            install_filename_old)
-
             if answer.lower() in ['n', 'no']:
                 print('Keeping old install ({install_path_old})')
             else:
+                install_path_old = os.path.join(DIR_PATH_INSTALL,
+                                                install_filename_old)
+
                 try:
                     os.remove(install_path_old)
                     print(f'{install_path_old} deleted.')
