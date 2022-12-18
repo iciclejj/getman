@@ -62,12 +62,34 @@ def install_(url, install_filename=None, force=False, command=None):
         print('NB: could not determine download_filename.'
               ' Using provided custom program name.')
 
-    # TODO: resolve new install_filename for same url when force == True
     if not force and url in db_dict['packages']:
         install_filename_curr = db_dict['packages'][url]['install_filename']
         print(f'Package already in database as {install_filename_curr}.'
                ' Use -f or --force to force install.')
         return
+
+    # Resolve different install_filename when force-reinstalling package
+    if url in db_dict['packages']:
+        install_filename_old = db_dict['packages'][url]['install_filename']
+
+        if install_filename != install_filename_old:
+            answer = input( 'Program previously installed as'
+                           f' {install_filename_old}'
+                           f' (new name: {install_filename}).'
+                            ' Delete old program before re-installing'
+                            ' with new name? (Y/n): ')
+
+            install_path_old = os.path.join(DIR_PATH_INSTALL,
+                                            install_filename_old)
+
+            if answer.lower in ['n', 'no']:
+                print('Keeping old install ({install_path_old})')
+            else:
+                try:
+                    os.remove(install_path_old)
+                    print(f'{install_path_old} deleted.')
+                except FileNotFoundError:
+                    print(f'{install_path_old} not found. Skipping deletion.')
 
     # a bit useless in its current state
     # TODO: proper warning
