@@ -14,8 +14,15 @@ from constants import (
         )
 from database import init_db
 
-_GETMAN_REQUIRED_DIR_PATHS = [DIR_PATH_CONFIG, DIR_PATH_DATA, DIR_PATH_PACKAGES]
-_GETMAN_REQUIRED_FILE_PATHS = [FILE_PATH_CONFIG, FILE_PATH_DB]
+_GETMAN_REQUIRED_DIR_PATHS = [
+        DIR_PATH_CONFIG,
+        DIR_PATH_DATA,
+        DIR_PATH_PACKAGES,
+        ]
+_GETMAN_REQUIRED_FILE_PATHS = [
+        FILE_PATH_CONFIG,
+        FILE_PATH_DB,
+        ]
 
 def init_getman():
     def _create_dir_if_not_exists(path):
@@ -82,7 +89,8 @@ if __name__ == '__main__':
 
     print()
 
-    user_input = input('Type DELETE to recursively delete all getman directories\n')
+    user_input = input('Type DELETE'
+                       ' to recursively delete all getman directories\n')
 
     if user_input == 'DELETE':
         delete_everything()

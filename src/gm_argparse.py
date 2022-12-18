@@ -1,5 +1,4 @@
 import argparse
-import sys
 
 def create_parser():
     parser = argparse.ArgumentParser(
@@ -49,11 +48,11 @@ def _add_uninstall(subparsers):
     # arguments
     parser.add_argument(
             'package',
-            help='Filename (command) of the package you wish to upgrade. Source'
-                 ' URL can be supplied instead with -u or --url')
+            help='Filename (command) of the package you wish to upgrade.'
+                 ' Source URL can be supplied instead with -u or --url.')
 
     parser.add_argument(
-            '-u', '--url', 
+            '-u', '--url',
             action='store_true',
             help='Provide URL instead of filename/command')
 
@@ -78,7 +77,7 @@ def _add_init(subparsers):
             help='Initialize the getman environment')
 
     parser.add_argument(
-            '-p', '--purge', 
+            '-p', '--purge',
             action='store_true',
             help='Delete all getman directories before running initialization')
 

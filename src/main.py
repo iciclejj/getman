@@ -1,5 +1,3 @@
-import sys
-
 import command_handlers
 from gm_argparse import create_parser
 from init_getman import init_getman, needs_init
@@ -21,7 +19,7 @@ def main():
         print('Missing required files. Exiting. Nothing has been done.')
         return
 
-    command_handler = getattr(command_handlers, args.command + '_') 
+    command_handler = getattr(command_handlers, args.command + '_')
     command_handler(**vars(args))
 
 if __name__ == '__main__':

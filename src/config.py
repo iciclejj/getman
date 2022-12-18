@@ -3,7 +3,6 @@ import os
 
 from constants import (
         FILE_PATH_CONFIG,
-        FILE_PATH_DB,
         )
 
 def init_config():
@@ -28,8 +27,9 @@ if __name__ == '__main__':
         print(f'{FILE_PATH_CONFIG} already exists.\n')
         config_dict = get_config()
     else:
-        print(f'{FILE_PATH_CONFIG} does not exist. Running init_config then deleting file.\n')
-        config_path = init_config(FILE_PATH_DB)
+        print(f'{FILE_PATH_CONFIG} does not exist.'
+               ' Running init_config then deleting file.\n')
+        config_path = init_config()
         config_dict = get_config()
         os.remove(config_path)
 

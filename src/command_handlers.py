@@ -23,9 +23,12 @@ from constants import (
 import database as db
 import init_getman
 
-# TODO: create separate .py files for each command and turn this into an "interface" file
+# TODO: create separate .py files for each command
+#               and turn this into an "interface" file
 
-SUPPORTED_CONTENT_TYPE_FIRSTS = ['application'] # must use startswith (after '/' is excluded)
+# must match SUPPORTED_CONTENT_TYPE_FIRSTS with startswith
+#         (text after '/' is excluded from this list)
+SUPPORTED_CONTENT_TYPE_FIRSTS = ['application']
 SUPPORTED_FILETYPES = ['application/x-pie-executable']
 
 # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
@@ -36,18 +39,19 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 #
 #       EXPERIMENTAL TODOS:
 #       auto-detect system/architecture
-#       auto-detect site-specific preferred download urls (for example from git repo)
+#       auto-detect site-specific preferred download urls
+#               (for example from git repo)
 #       use api when supported (for example api.github.com)
 def install_(url, install_filename=None, force=False, command=None):
     db_dict = db.get_db_dict()
 
     # download file and metadata
-    headers = _get_headers(url) # headers is an EmailMessage => returns None if key not found
+    # headers is an EmailMessage => returns None if key not found
+    headers = _get_headers(url)
 
     download_filename = headers.get_filename()
     content_type_first = headers['content-type'].partition('/')[0]
 
-    # TODO: maybe turn return into exception
     if download_filename is None:
         if install_filename is None:
             print('Could not determine download filename.'
@@ -58,20 +62,22 @@ def install_(url, install_filename=None, force=False, command=None):
         print('NB: could not determine download_filename.'
               ' Using provided custom program name.')
 
-    # TODO: make listing of filename nicer (currently shows download_filename)
-    #       resolve new install_filename for same url when force == True
+    # TODO: resolve new install_filename for same url when force == True
     if not force and url in db_dict['packages']:
         install_filename_curr = db_dict['packages'][url]['install_filename']
-        print(f'Package already in database as {install_filename_curr}')
+        print(f'Package already in database as {install_filename_curr}.'
+               ' Use -f or --force to force install.')
         return
 
     # a bit useless in its current state
+    # TODO: proper warning
     if content_type_first not in SUPPORTED_CONTENT_TYPE_FIRSTS:
-        print('Warning: could not determine if correct filetype before downloading.'
-              ' Will check again after download.') # TODO: proper warning
+        print('Warning: could not determine if correct filetype before'
+              ' downloading. Will check again after download.')
 
+    # downloads file to download_path
     download_path = os.path.join(DIR_PATH_PACKAGES, download_filename)
-    urllib.request.urlretrieve(url, filename=download_path) # downloads file to download_path
+    urllib.request.urlretrieve(url, filename=download_path)
 
     # install file
     filetype = magic.from_file(download_path, mime=True)
@@ -97,7 +103,8 @@ def install_(url, install_filename=None, force=False, command=None):
     except Exception  as e: # TODO: HANDLE THIS PROPERLY !!!
         os.remove(download_path)
         print(e)
-        print('Run with sudo (\'sudo -E\' if running getman as a python script)')
+        print('Run with sudo (\'sudo -E\''
+              ' if running getman as a python script)')
         return
 
     content_md5 = _get_base64_md5(install_path)
@@ -124,7 +131,8 @@ def update_(command=None):
         content_md5 = headers['content-md5']
 
         if content_md5 is None:
-            print('Warning: not something isn\'t implemented yet, skipping package Xd')
+            print('Warning: not something isn\'t implemented yet'
+                  ', skipping package Xd')
             continue
 
         if content_md5 != package_metadata['md5_base64']:
@@ -152,7 +160,8 @@ def upgrade_(command=None):
         del upgradeable[url]
         n_upgraded += 1
 
-    # reload db_dict after modification by install (REMOVE IF IMPLEMENTING INDEPENDENT UPGRADER)
+    # reload db_dict after modification by install
+    #         (REMOVE IF IMPLEMENTING INDEPENDENT UPGRADER)
     db_dict = db.get_db_dict()
     db_dict['upgradeable'] = upgradeable
 
@@ -198,15 +207,16 @@ def list_(command=None):
 def init_(purge, command=None):
     if not init_getman.needs_init():
         answer = input('All getman files already exist. Run initialization'
-                       ' anyways? (Will ask before overwriting files). (Y/n): ')
+                       ' anyways? (Will ask before overwriting files).'
+                       ' (Y/n): ')
 
         if answer.lower in ['n', 'no']:
             print('Initialization cancelled. Nothing has been done.')
             return
 
     if purge:
-        print('Requested purge. Directories that will be deleted before running'
-              ' initialization:')
+        print('Requested purge. Directories that will be deleted before'
+              ' running initialization:')
         print(DIR_PATH_DATA)
         print(DIR_PATH_CONFIG, '\n')
 
