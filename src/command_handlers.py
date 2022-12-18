@@ -49,10 +49,11 @@ def install_(url, install_filename=None, force=False, command=None):
 
     # headers is an EmailMessage => returns None if key not found
     headers = _get_headers(url)
-
     download_filename = headers.get_filename()
     content_type_first = headers['content-type'].partition('/')[0]
 
+    # TODO: Fetch the possible flags from argparser.
+    #               Probably pass the entire parser
     if download_filename is None:
         if install_filename is None:
             print('Could not determine download filename.'
@@ -117,7 +118,6 @@ def install_(url, install_filename=None, force=False, command=None):
         raise ValueError(f'Unsupported filetype: {filetype}')
 
     # TODO: make this less hard-coded
-    #       REMOVE DOWNLOAD FILES AFTER ERROR OR IMPLEMENT CACHE HANDLER
     #       handle replace error
     try:
         if filetype == 'application/x-pie-executable':
