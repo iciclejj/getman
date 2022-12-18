@@ -200,7 +200,7 @@ def init_(purge, command=None):
         answer = input('All getman files already exist. Run initialization'
                        ' anyways? (Will ask before overwriting files). (Y/n): ')
 
-        if answer not in ['y', 'Y', '']:
+        if answer.lower in ['n', 'no']:
             print('Initialization cancelled. Nothing has been done.')
             return
 

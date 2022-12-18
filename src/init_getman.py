@@ -29,7 +29,7 @@ def init_getman():
 
         answer = input(f'{path} already exists. Overwrite? (y/N): ')
 
-        if answer in ['y', 'Y']:
+        if answer.lower in ['y', 'yes']:
             fn_create_file()
             print('Overwriting file...')
 
