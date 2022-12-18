@@ -45,7 +45,8 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 def install_(url, install_filename=None, force=False, command=None):
     db_dict = db.get_db_dict()
 
-    # download file and metadata
+    # DOWNLOAD FILE AND METADATA
+
     # headers is an EmailMessage => returns None if key not found
     headers = _get_headers(url)
 
@@ -97,24 +98,27 @@ def install_(url, install_filename=None, force=False, command=None):
         print('Warning: could not determine if correct filetype before'
               ' downloading. Will check again after download.')
 
-    # downloads file to download_path
     download_path = os.path.join(DIR_PATH_PACKAGES, download_filename)
+
+    # download file to download_path
     urllib.request.urlretrieve(url, filename=download_path)
 
-    # install file
-    filetype = magic.from_file(download_path, mime=True)
+    # INSTALL FILE
 
     if install_filename is None:
         install_filename = pathlib.Path(download_path).stem
 
+    filetype = magic.from_file(download_path, mime=True)
     install_path = os.path.join(DIR_PATH_INSTALL, install_filename)
 
-    # TODO: maybe make a general error handler for the install command
+    # TODO probably don't delete the old install before checking this
     if filetype not in SUPPORTED_FILETYPES:
         os.remove(download_path)
         raise ValueError(f'Unsupported filetype: {filetype}')
 
     # TODO: make this less hard-coded
+    #       REMOVE DOWNLOAD FILES AFTER ERROR OR IMPLEMENT CACHE HANDLER
+    #       handle replace error
     try:
         if filetype == 'application/x-pie-executable':
             file_st = os.stat(download_path)
@@ -122,14 +126,11 @@ def install_(url, install_filename=None, force=False, command=None):
                            | stat.S_IXOTH)
             os.chmod(download_path, plus_x_mode)
             os.replace(download_path, install_path)
-    except Exception  as e: # TODO: HANDLE THIS PROPERLY !!!
-        os.remove(download_path)
-        print(e)
-        print('Run with sudo (\'sudo -E\''
-              ' if running getman as a python script)')
-        return
+    except PermissionError as e:
+        raise PermissionError('Run with sudo (\'sudo -E\' if running getman as'
+                              'a python script)') from e
 
-    content_md5 = _get_base64_md5(install_path)
+    install_md5 = _get_base64_md5(install_path)
 
     db_dict['packages'][url] = {
             'created_at': str(datetime.now()),
@@ -137,7 +138,7 @@ def install_(url, install_filename=None, force=False, command=None):
             'install_filename': install_filename,
             'install_path': install_path,
             'download_filename': download_filename,
-            'md5_base64': content_md5,
+            'md5_base64': install_md5,
     }
 
     db.overwrite_db(db_dict)
