@@ -22,6 +22,7 @@ from constants import (
 
 import database as db
 import init_getman
+import user_input
 
 # TODO: create separate .py files for each command
 #               and turn this into an "interface" file
@@ -35,7 +36,8 @@ SUPPORTED_FILETYPES = ['application/x-pie-executable']
 SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 ssl._create_default_https_context = lambda: SSL_CONTEXT
 
-# TODO:
+# TODO: CHECK IF FILE ALREADY EXISTS IN bin DIR. confirm whether you're
+#               confirm whether you're overwriting correct one using md5
 #
 #       EXPERIMENTAL TODOS:
 #       auto-detect system/architecture
@@ -75,13 +77,13 @@ def install_(url, install_filename=None, force=False, command=None):
         install_filename_old = db_dict['packages'][url]['install_filename']
 
         if install_filename != install_filename_old:
-            answer = input( 'Program previously installed as'
-                           f' {install_filename_old}'
-                           f' (new name: {install_filename}).'
-                            ' Delete old program before re-installing'
-                            ' with new name? (Y/n): ')
+            delete_old = user_input.prompt_yes_no(
+                    f'Program previously installed as {install_filename_old}'
+                    f' (new name: {install_filename}). Delete old program'
+                     ' before re-installing with new name?',
+                    default=True)
 
-            if answer.lower() in ['n', 'no']:
+            if not delete_old:
                 print('Keeping old install ({install_path_old})')
             else:
                 install_path_old = os.path.join(DIR_PATH_INSTALL,
@@ -229,28 +231,27 @@ def list_(command=None):
 
 def init_(purge, command=None):
     if not init_getman.needs_init():
-        answer = input('All getman files already exist. Run initialization'
-                       ' anyways? (Will ask before overwriting files).'
-                       ' (Y/n): ')
+        force_init = user_input.prompt_yes_no(
+                'All getman files already exist. Run initialization anyways?'
+                ' (Will ask before overwriting files).',
+                default=True)
 
-        if answer.lower() in ['n', 'no']:
+        if not force_init:
             print('Initialization cancelled. Nothing has been done.')
             return
 
     if purge:
-        print('Requested purge. Directories that will be deleted before'
-              ' running initialization:')
-        print(DIR_PATH_DATA)
-        print(DIR_PATH_CONFIG, '\n')
+        confirm_purge = user_input.prompt_exact(
+                'Requested purge. Directories that will be deleted before'
+                f' running initialization:\n{DIR_PATH_DATA}\n{DIR_PATH_CONFIG}',
+                true_inputs=['DELETE'])
 
-        answer = input('Type DELETE to proceed: ')
-
-        if answer in ['DELETE']:
-            init_getman.delete_everything()
-            print('All getman directories deleted.\n')
-        else:
+        if not confirm_purge:
             print('Exiting. Nothing has been deleted. Nothing has been done.')
             return
+
+        init_getman.delete_everything()
+        print('All getman directories deleted.')
 
     init_getman.init_getman()
 

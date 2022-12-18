@@ -13,6 +13,7 @@ from constants import (
         FILE_PATH_CONFIG,
         )
 from database import init_db
+import user_input
 
 _GETMAN_REQUIRED_DIR_PATHS = [
         DIR_PATH_CONFIG,
@@ -33,12 +34,16 @@ def init_getman():
         if not isfile(path):
             fn_create_file()
             print(f'{path} created...')
+            return
 
-        answer = input(f'{path} already exists. Overwrite? (y/N): ')
+        overwrite = user_input.prompt_yes_no(
+                f'{path} already exists. Overwrite?',
+                default=False)
 
-        if answer.lower() in ['y', 'yes']:
+        if overwrite:
             fn_create_file()
             print('Overwriting file...')
+            return
 
         print('Keeping old file...')
 
@@ -46,8 +51,7 @@ def init_getman():
     print('Initializing getman files and directories in:',
            DIR_PATH_DATA,
            DIR_PATH_CONFIG,
-           sep='\n'
-          )
+           sep='\n')
 
     for dir_path in _GETMAN_REQUIRED_DIR_PATHS:
         _create_dir_if_not_exists(dir_path)
