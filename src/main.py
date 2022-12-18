@@ -9,7 +9,7 @@ def main():
     parser = create_parser()
     args = parser.parse_args()
 
-    if needs_init() and command != 'init':
+    if needs_init() and args.command != 'init':
         answer = input('Missing getman files detected. Run initialization?'
                        ' (Will ask before deleting or overwriting files).'
                        ' (y/N): ')
@@ -17,7 +17,7 @@ def main():
         if answer in ['y', 'Y']:
             init_getman()
 
-    if needs_init() and command != 'init':
+    if needs_init() and args.command != 'init':
         print('Missing required files. Exiting. Nothing has been done.')
         return
 
