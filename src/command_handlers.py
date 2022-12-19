@@ -181,7 +181,7 @@ def upgrade_(command=None):
     #       probably make a separate upgrade uninstaller
     for url in list(upgradeable.keys()): # list to allow delete as we go
         install_filename = db.get_package_attribute(url, 'install_filename')
-        install(url, install_filename, force=True)
+        install_(url, install_filename, force=True)
         del upgradeable[url]
         n_upgraded += 1
 
