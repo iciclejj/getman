@@ -20,7 +20,7 @@ from constants import (
         DIR_PATH_PACKAGES,
         )
 
-import database as db
+import database as db_module
 import init_getman
 import user_input
 
@@ -45,7 +45,7 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 #               (for example from git repo)
 #       use api when supported (for example api.github.com)
 def install_(url, install_filename=None, force=False, command=None):
-    db_dict = db.get_db_dict()
+    db = db_module.PackageDatabase()
 
     # DOWNLOAD FILE AND METADATA
 
@@ -57,6 +57,7 @@ def install_(url, install_filename=None, force=False, command=None):
     # TODO: Fetch the possible flags from argparser.
     #               Probably pass the entire parser
     if download_filename is None:
+        # TODO: `and` this?
         if install_filename is None:
             print('Could not determine download filename.'
                   ' Please provide custom name with --name')
@@ -66,15 +67,19 @@ def install_(url, install_filename=None, force=False, command=None):
         print('NB: could not determine download_filename.'
               ' Using provided custom program name.')
 
-    if not force and url in db_dict['packages']:
-        install_filename_curr = db_dict['packages'][url]['install_filename']
+    if not force and db.is_package_url(url):
+        # TODO: rename to _old for consistency
+        install_filename_curr = db.get_package_attribute(url,
+                                                         'install_filename')
         print(f'Package already in database as {install_filename_curr}.'
                ' Use -f or --force to force install.')
         return
 
     # Resolve different install_filename when force-reinstalling package
-    if url in db_dict['packages']:
-        install_filename_old = db_dict['packages'][url]['install_filename']
+    # TODO: this currently asks no matter what
+    if db.is_package_url(url):
+        install_filename_old = db.get_package_attribute(url,
+                                                        'install_filename')
 
         if install_filename != install_filename_old:
             delete_old = user_input.prompt_yes_no(
@@ -134,7 +139,7 @@ def install_(url, install_filename=None, force=False, command=None):
 
     install_md5 = _get_base64_md5(install_path)
 
-    db_dict['packages'][url] = {
+    db.db_dict['packages'][url] = {
             'created_at': str(datetime.now()),
             'updated_at': str(datetime.now()),
             'install_filename': install_filename,
@@ -143,14 +148,14 @@ def install_(url, install_filename=None, force=False, command=None):
             'md5_base64': install_md5,
     }
 
-    db.overwrite_db(db_dict)
+    db._overwrite_db()
 
     print(f'{install_filename} successfully installed to {install_path}')
 
 def update_(command=None):
-    db_dict = db.get_db_dict()
+    db = db_module.PackageDatabase()
 
-    for url, package_metadata in db_dict['packages'].items():
+    for url, package_metadata in db.db_dict['packages'].items():
         headers = _get_headers(url)
         # TODO: maybe rename content_md5 to md5_base64 (everywhere)
         content_md5 = headers['content-md5']
@@ -161,17 +166,19 @@ def update_(command=None):
             continue
 
         if content_md5 != package_metadata['md5_base64']:
-            db_dict['upgradeable'][url] = {}
+            db.db_dict['upgradeable'][url] = {}
 
-    db.overwrite_db(db_dict)
+    db._overwrite_db()
 
-    upgradeable = db.get_db_dict()['upgradeable']
+    # TODO: maybe oneline this
+    upgradeable = db.db_dict['upgradeable']
     n_upgradeable = len(upgradeable)
 
     print(f'Update successful. Upgradeable packages: {n_upgradeable}')
 
 def upgrade_(command=None):
-    upgradeable = db.get_db_dict()['upgradeable']
+    db = db_module.PackageDatabase()
+    upgradeable = db.db_dict['upgradeable']
 
     n_upgraded = 0
 
@@ -182,15 +189,15 @@ def upgrade_(command=None):
     for url in list(upgradeable.keys()): # list to allow delete as we go
         install_filename = db.get_package_attribute(url, 'install_filename')
         install_(url, install_filename, force=True)
-        del upgradeable[url]
+        del upgradeable[url] # TODO: REMEMBER TO REMOVE THIS DIRECT DB EDIT
         n_upgraded += 1
 
     # reload db_dict after modification by install
     #         (REMOVE IF IMPLEMENTING INDEPENDENT UPGRADER)
-    db_dict = db.get_db_dict()
-    db_dict['upgradeable'] = upgradeable
+    db = db_module.PackageDatabase() # TODO: add db.reload_db
+    db.db_dict['upgradeable'] = upgradeable
 
-    db.overwrite_db(db_dict)
+    db._overwrite_db()
 
     if n_upgraded > 0:
         print(f'Upgrade successful. Upgraded packages: {n_upgraded}')
@@ -198,10 +205,14 @@ def upgrade_(command=None):
         print(f'Nothing to upgrade.')
 
 def uninstall_(package, is_url, command=None):
+    db = db_module.PackageDatabase()
+
+    # TODO: make this cleaner
     if is_url:
         url = package
     else:
-        url = db.get_url_from_install_filename(package)
+        install_filename = package
+        url = db.get_url_from_install_filename(install_filename)
 
     # make sure package exists
     if url is None or not db.is_package_url(url):
@@ -223,7 +234,9 @@ def uninstall_(package, is_url, command=None):
     print('Package uninstalled.')
 
 def list_(command=None):
-    packages = db.get_db_dict()['packages']
+    # TODO: add get_packages or something (everywhere)
+    db = db_module.PackageDatabase()
+    packages = db.db_dict['packages']
 
     for url, package_metadata in packages.items():
         install_filename = package_metadata['install_filename']
