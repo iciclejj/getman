@@ -52,7 +52,7 @@ def _add_uninstall(subparsers):
                  ' Source URL can be supplied instead with -u or --url.')
 
     parser.add_argument(
-            '-u', '--url',
+            '-u', '--url', dest='is_url',
             action='store_true',
             help='Provide URL instead of filename/command')
 
