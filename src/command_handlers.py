@@ -139,7 +139,7 @@ def install_(url, install_filename=None, force=False, command=None):
 
     install_md5 = _get_base64_md5(install_path)
 
-    db.db_dict['packages'][url] = {
+    db['packages'][url] = {
             'created_at': str(datetime.now()),
             'updated_at': str(datetime.now()),
             'install_filename': install_filename,
@@ -155,7 +155,7 @@ def install_(url, install_filename=None, force=False, command=None):
 def update_(command=None):
     db = db_module.PackageDatabase()
 
-    for url, package_metadata in db.db_dict['packages'].items():
+    for url, package_metadata in db['packages'].items():
         headers = _get_headers(url)
         # TODO: maybe rename content_md5 to md5_base64 (everywhere)
         content_md5 = headers['content-md5']
@@ -166,19 +166,19 @@ def update_(command=None):
             continue
 
         if content_md5 != package_metadata['md5_base64']:
-            db.db_dict['upgradeable'][url] = {}
+            db['upgradeable'][url] = {}
 
     db._overwrite_db()
 
     # TODO: maybe oneline this
-    upgradeable = db.db_dict['upgradeable']
+    upgradeable = db['upgradeable']
     n_upgradeable = len(upgradeable)
 
     print(f'Update successful. Upgradeable packages: {n_upgradeable}')
 
 def upgrade_(command=None):
     db = db_module.PackageDatabase()
-    upgradeable = db.db_dict['upgradeable']
+    upgradeable = db['upgradeable']
 
     n_upgraded = 0
 
@@ -195,7 +195,7 @@ def upgrade_(command=None):
     # reload db_dict after modification by install
     #         (REMOVE IF IMPLEMENTING INDEPENDENT UPGRADER)
     db = db_module.PackageDatabase() # TODO: add db.reload_db
-    db.db_dict['upgradeable'] = upgradeable
+    db['upgradeable'] = upgradeable
 
     db._overwrite_db()
 
@@ -236,7 +236,7 @@ def uninstall_(package, is_url, command=None):
 def list_(command=None):
     # TODO: add get_packages or something (everywhere)
     db = db_module.PackageDatabase()
-    packages = db.db_dict['packages']
+    packages = db['packages']
 
     for url, package_metadata in packages.items():
         install_filename = package_metadata['install_filename']
