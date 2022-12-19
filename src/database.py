@@ -9,6 +9,7 @@ from constants import (
 
 class PackageDatabase():
     # TODO: more efficient database updating than full overwrite
+    #       add __getitem__ instead of db.db_dict['something']
 
     def _overwrite_db(self):
         db_json = json.dumps(self.db_dict)
@@ -31,12 +32,12 @@ class PackageDatabase():
         if self.db_dict['packages'].get(url) is None:
             raise KeyError(f'Package not found in database: {url}')
 
-        del db_dict['packages'][url]
+        del self.db_dict['packages'][url]
 
         if include_upgradeable:
-            db_dict['upgradeable'][url]
+            self.db_dict['upgradeable'].pop(url, None)
 
-        self._overwrite_db(db_dict)
+        self._overwrite_db()
 
     def is_package_url(self, url):
         if url in self.db_dict['packages']:
@@ -48,7 +49,7 @@ class PackageDatabase():
         return self.db_dict['packages'][url][attribute]
 
     def get_url_from_install_filename(self, install_filename):
-        for url, package_metadata in self.db_dict['packages']:
+        for url, package_metadata in self.db_dict['packages'].items():
             if package_metadata['install_filename'] == install_filename:
                 return url
 
