@@ -26,6 +26,9 @@ class PackageDatabase():
 
         self.db_path = db_path
 
+    def __getitem__(self, key):
+        return self.db_dict[key]
+
     def remove_package_entry(self, url, include_upgradeable=True):
         # TODO: add include_install and allow indexing using install_filename
         #               remove include_upgradeable
