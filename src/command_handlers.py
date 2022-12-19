@@ -230,6 +230,7 @@ def list_(command=None):
         print(install_filename)
 
 def init_(purge, command=None):
+    # TODO: add option to delete all installed binaries before purging db
     if not init_getman.needs_init():
         force_init = user_input.prompt_yes_no(
                 'All getman files already exist. Run initialization anyways?'
