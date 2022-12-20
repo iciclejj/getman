@@ -155,7 +155,6 @@ def update_(command=None):
     packages = db.get_packages()
 
     for url, package_metadata in packages.items():
-        # TODO: maybe rename content_md5 to md5_base64 (everywhere)
         headers = _get_headers(url)
         content_md5 = headers['content-md5']
 
@@ -181,8 +180,7 @@ def upgrade_(command=None):
         print('Nothing to upgrade.')
         return
 
-    # TODO: try/except
-    #       show total GB before upgrade (in install too)
+    # TODO: show total GB before upgrade (in install too)
     #       progress bar (in install too)
     #       probably make a separate upgrade uninstaller
     #       quote printed paths everywhere (this one isn't a path)
@@ -208,19 +206,16 @@ def upgrade_(command=None):
 def uninstall_(package, is_url, command=None):
     db = db_module.DB()
 
-    # TODO: make this cleaner
     if is_url:
         url = package
     else:
         install_filename = package
         url = db.get_url_from_install_filename(install_filename)
 
-    # make sure package exists
     if url is None or not db.is_package_url(url):
         print('Package not found in database.')
         return
 
-    # assume it exists from here on
     install_path = db.get_package_attribute(url, 'install_path')
 
     try:
