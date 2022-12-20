@@ -44,7 +44,8 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 #       auto-detect site-specific preferred download urls
 #               (for example from git repo)
 #       use api when supported (for example api.github.com)
-def install_(url, install_filename=None, force=False, command=None):
+def install_(url, install_filename=None, force=False, command=None,
+             update_only=False):
     db = db_module.DB()
 
     # DOWNLOAD FILE AND METADATA
@@ -139,8 +140,12 @@ def install_(url, install_filename=None, force=False, command=None):
 
     install_md5 = _get_base64_md5(install_path) # TODO: clarify b64
 
+    if command == 'upgrade':
+        update_only = True
+
     db.add_package_entry(url, install_filename, install_path,
-                         download_filename, install_md5)
+                         download_filename, install_md5,
+                         update_only=update_only)
 
     print(f'{install_filename} successfully installed to {install_path}')
 
@@ -187,7 +192,8 @@ def upgrade_(command=None):
         install_filename = db.get_package_attribute(url, 'install_filename')
 
         try:
-            install_(url, install_filename, force=True)
+            install_(url, install_filename, force=True, update_only=True,
+                     command=command)
         except Exception as e:
             print(f'Error during package installation. Package:'
                    '{install_filename} . Exception: {e}')
