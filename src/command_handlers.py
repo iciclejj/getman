@@ -24,9 +24,6 @@ import database as db_module
 import init_getman
 import user_input
 
-# TODO: create separate .py files for each command
-#               and turn this into an "interface" file
-
 # must match SUPPORTED_CONTENT_TYPE_FIRSTS with startswith
 #         (text after '/' is excluded from this list)
 SUPPORTED_CONTENT_TYPE_FIRSTS = ['application']
@@ -57,27 +54,24 @@ def install_(url, install_filename=None, force=False, command=None,
 
     # TODO: Fetch the possible flags from argparser.
     #               Probably pass the entire parser
-    if download_filename is None:
-        # TODO: `and` this?
-        if install_filename is None:
-            print('Could not determine download filename.'
-                  ' Please provide custom name with --name')
-            return
+    if not force and db.is_package_url(url):
+        install_filename_old = db.get_package_attribute(url,
+                                                        'install_filename')
+        print(f'Package already in database as {install_filename_old}.'
+               ' Use -f or --force to force install.')
+        return
 
+    if download_filename is None and install_filename is None:
+        print('Could not determine download filename.'
+              ' Please provide custom name with --name')
+        return
+
+    if download_filename is None:
         download_filename = install_filename
         print('NB: could not determine download_filename.'
               ' Using provided custom program name.')
 
-    if not force and db.is_package_url(url):
-        # TODO: rename to _old for consistency
-        install_filename_curr = db.get_package_attribute(url,
-                                                         'install_filename')
-        print(f'Package already in database as {install_filename_curr}.'
-               ' Use -f or --force to force install.')
-        return
-
     # Resolve different install_filename when force-reinstalling package
-    # TODO: this currently asks no matter what
     if db.is_package_url(url):
         install_filename_old = db.get_package_attribute(url,
                                                         'install_filename')
@@ -138,14 +132,20 @@ def install_(url, install_filename=None, force=False, command=None,
         raise PermissionError('Run with sudo (\'sudo -E\' if running getman as'
                               'a python script)') from e
 
-    install_md5 = _get_base64_md5(install_path) # TODO: clarify b64
+    install_md5_base64 = _get_base64_md5(install_path)
 
     if command == 'upgrade':
         update_only = True
 
-    db.add_package_entry(url, install_filename, install_path,
-                         download_filename, install_md5,
-                         update_only=update_only)
+    package_entry_partial = {
+            'url': url,
+            'install_filename': install_filename,
+            'install_path': install_path,
+            'download_filename': download_filename,
+            'md5_base64': install_md5_base64,
+            'update_only': update_only}
+
+    db.add_package_entry(**package_entry_partial)
 
     print(f'{install_filename} successfully installed to {install_path}')
 
@@ -235,7 +235,6 @@ def uninstall_(package, is_url, command=None):
     print('Package uninstalled.')
 
 def list_(command=None):
-    # TODO: add get_packages or something (everywhere)
     db = db_module.DB()
 
     packages = db.get_packages()
