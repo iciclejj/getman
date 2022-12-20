@@ -239,7 +239,8 @@ def uninstall_(package, is_url, command=None):
 def list_(command=None):
     # TODO: add get_packages or something (everywhere)
     db = db_module.DB()
-    packages = db['packages']
+
+    packages = db.get_packages()
 
     for url, package_metadata in packages.items():
         install_filename = package_metadata['install_filename']
