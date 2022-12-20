@@ -71,6 +71,11 @@ def _add_list(subparsers):
             'list',
             help='List installed packages')
 
+    parser.add_argument(
+            '-v', '--verbose',
+            action='store_true',
+            help='Detailed (verbose) package listing.')
+
 def _add_init(subparsers):
     parser = subparsers.add_parser(
             'init',

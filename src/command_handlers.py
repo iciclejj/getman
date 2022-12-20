@@ -229,9 +229,13 @@ def uninstall_(package, is_url, command=None):
     print('Package entry removed...')
     print('Package uninstalled.')
 
-def list_(command=None):
-    # TODO: --verbose or --details
+def list_(verbose=False, command=None):
+    if verbose:
+        _list_packages_verbose()
+    else:
+        _list_packages()
 
+def _list_packages():
     db = db_module.DB()
 
     packages = db.get_packages()
@@ -241,7 +245,7 @@ def list_(command=None):
     for install_filename in install_filenames:
         print(install_filename)
 
-def _list_verbose():
+def _list_packages_verbose():
     db = db_module.DB()
 
     packages = db.get_packages()
