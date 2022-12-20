@@ -58,6 +58,9 @@ class DB():
     def get_upgradeable(self):
         return DB.db_dict['upgradeable'] # TODO: add .copy() everywhere
 
+    def get_packages(self):
+        return DB.db_dict['packages'] # TODO: add .copy() everywhere
+
     def is_package_url(self, url):
         if url in DB.db_dict['packages']:
             return True
