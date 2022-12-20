@@ -10,6 +10,8 @@ from constants import (
 class DB():
     # TODO: more efficient database updating than full overwrite
     #       add __getitem__ instead of db.db_dict['something']
+    #       stop using url as primary key (use no primary key)
+    #               do this for both packages and upgradeable
 
     # Shared db_path and db_dict across all instances
     if not os.path.isfile(FILE_PATH_DB):
@@ -54,6 +56,10 @@ class DB():
             self._overwrite_db()
         except KeyError as e:
             raise KeyError('upgradeable entry not found') from e
+
+    def add_upgradeable_entry(self, url):
+        DB.db_dict['upgradeable'][url] = {}
+        self._overwrite_db()
 
     def get_upgradeable(self):
         return DB.db_dict['upgradeable'] # TODO: add .copy() everywhere
