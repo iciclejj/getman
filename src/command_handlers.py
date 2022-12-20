@@ -155,9 +155,11 @@ def install_(url, install_filename=None, force=False, command=None):
 def update_(command=None):
     db = db_module.DB()
 
-    for url, package_metadata in db['packages'].items():
-        headers = _get_headers(url)
+    packages = db.get_packages().copy() # TODO: remove .copy() later
+
+    for url, package_metadata in packages.items():
         # TODO: maybe rename content_md5 to md5_base64 (everywhere)
+        headers = _get_headers(url)
         content_md5 = headers['content-md5']
 
         if content_md5 is None:
@@ -166,13 +168,9 @@ def update_(command=None):
             continue
 
         if content_md5 != package_metadata['md5_base64']:
-            db['upgradeable'][url] = {}
+            db.add_upgradeable_entry(url)
 
-    db._overwrite_db()
-
-    # TODO: maybe oneline this
-    upgradeable = db['upgradeable']
-    n_upgradeable = len(upgradeable)
+    n_upgradeable = len(db.get_upgradeable())
 
     print(f'Update successful. Upgradeable packages: {n_upgradeable}')
 
