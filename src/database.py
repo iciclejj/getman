@@ -61,10 +61,14 @@ class DB():
                           download_filename, md5_base64):
 
         # TODO: fix create_at and update_at (in db root too)
+        curr_time = str(datetime.now())
+
+        created_at = curr_time
+        updated_at = curr_time
 
         package_dict = {
-                'created_at': str(datetime.now()),
-                'updated_at': str(datetime.now()),
+                'created_at': created_at,
+                'updated_at': updated_at,
                 'install_filename': install_filename,
                 'install_path': install_path,
                 'download_filename': download_filename,
@@ -107,9 +111,11 @@ def init_db(): # overwrite=True
     if not os.path.isdir(DIR_PATH_DB):
         os.mkdir(DIR_PATH_DB)
 
+    curr_time = str(datetime.now())
+
     db_dict = {
-            'created_at': str(datetime.now()),
-            'updated_at': str(datetime.now()),
+            'created_at': curr_time,
+            'updated_at': curr_time,
             'packages': {},
             'upgradeable': {}
     }
