@@ -70,7 +70,10 @@ def init_db(): # overwrite=True
             'upgradeable': {}
     }
 
-    overwrite_db(db_dict)
+    db_json = json.dumps(db_dict)
+
+    with open(FILE_PATH_DB, 'w+', encoding='utf-8') as db_file:
+        db_file.write(db_json)
 
     return FILE_PATH_DB
 
