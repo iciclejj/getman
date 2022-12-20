@@ -235,9 +235,10 @@ def list_(command=None):
     db = db_module.DB()
 
     packages = db.get_packages()
+    install_filenames = [db.get_package_attribute(url, 'install_filename')
+                         for url in packages.keys()]
 
-    for url, package_metadata in packages.items():
-        install_filename = package_metadata['install_filename']
+    for install_filename in install_filenames:
         print(install_filename)
 
 def init_(purge, command=None):
