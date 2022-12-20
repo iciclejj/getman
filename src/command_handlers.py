@@ -182,12 +182,16 @@ def upgrade_(command=None):
     upgradeable = db.get_upgradeable().copy() # TODO: remove .copy() later
     n_upgraded = 0
 
+    if len(upgradeable) == 0:
+        print('Nothing to upgrade.')
+        return
+
     # TODO: try/except
     #       show total GB before upgrade (in install too)
     #       progress bar (in install too)
     #       probably make a separate upgrade uninstaller
     #       quote printed paths everywhere (this one isn't a path)
-    #       more concrete exception?
+    #       more concrete exception? + better handling
 
     for url in upgradeable.keys():
         install_filename = db.get_package_attribute(url, 'install_filename')
@@ -197,16 +201,13 @@ def upgrade_(command=None):
         except Exception as e:
             print(f'Error during package installation. Package:'
                    '{install_filename} . Exception: {e}')
+            continue
 
         db.remove_upgradeable_entry(url)
-
         n_upgraded += 1
 
-    # TODO: fix and refactor this
-    if n_upgraded > 0:
-        print(f'Upgrade successful. Upgraded packages: {n_upgraded}')
-    else:
-        print(f'Nothing to upgrade.')
+    print( 'Upgrade completed. Upgraded packages:'
+          f'{n_upgraded}/{len(upgradeable)}')
 
 def uninstall_(package, is_url, command=None):
     db = db_module.DB()
