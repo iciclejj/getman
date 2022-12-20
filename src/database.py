@@ -7,7 +7,7 @@ from constants import (
         DIR_PATH_DB,
         )
 
-class PackageDatabase():
+class DB():
     # TODO: more efficient database updating than full overwrite
     #       add __getitem__ instead of db.db_dict['something']
 

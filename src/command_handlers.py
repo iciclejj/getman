@@ -45,7 +45,7 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 #               (for example from git repo)
 #       use api when supported (for example api.github.com)
 def install_(url, install_filename=None, force=False, command=None):
-    db = db_module.PackageDatabase()
+    db = db_module.DB()
 
     # DOWNLOAD FILE AND METADATA
 
@@ -153,7 +153,7 @@ def install_(url, install_filename=None, force=False, command=None):
     print(f'{install_filename} successfully installed to {install_path}')
 
 def update_(command=None):
-    db = db_module.PackageDatabase()
+    db = db_module.DB()
 
     for url, package_metadata in db['packages'].items():
         headers = _get_headers(url)
@@ -177,7 +177,7 @@ def update_(command=None):
     print(f'Update successful. Upgradeable packages: {n_upgradeable}')
 
 def upgrade_(command=None):
-    db = db_module.PackageDatabase()
+    db = db_module.DB()
     upgradeable = db['upgradeable']
 
     n_upgraded = 0
@@ -194,7 +194,7 @@ def upgrade_(command=None):
 
     # reload db_dict after modification by install
     #         (REMOVE IF IMPLEMENTING INDEPENDENT UPGRADER)
-    db = db_module.PackageDatabase() # TODO: add db.reload_db
+    db = db_module.DB() # TODO: add db.reload_db
     db['upgradeable'] = upgradeable
 
     db._overwrite_db()
@@ -205,7 +205,7 @@ def upgrade_(command=None):
         print(f'Nothing to upgrade.')
 
 def uninstall_(package, is_url, command=None):
-    db = db_module.PackageDatabase()
+    db = db_module.DB()
 
     # TODO: make this cleaner
     if is_url:
@@ -235,7 +235,7 @@ def uninstall_(package, is_url, command=None):
 
 def list_(command=None):
     # TODO: add get_packages or something (everywhere)
-    db = db_module.PackageDatabase()
+    db = db_module.DB()
     packages = db['packages']
 
     for url, package_metadata in packages.items():
