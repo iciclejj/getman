@@ -41,7 +41,6 @@ class DB():
 
     def remove_package_entry(self, url, include_upgradeable=True):
         # TODO: add include_install and allow indexing using install_filename
-        #               remove include_upgradeable
         if DB.db_dict['packages'].get(url) is None:
             raise KeyError(f'Package not found in database: {url}')
 
@@ -53,11 +52,14 @@ class DB():
         self._overwrite_db()
 
     def remove_upgradeable_entry(self, url):
-        try:
-            del DB.db_dict['upgradeable'][url]
-            self._overwrite_db()
-        except KeyError as e:
+        upgradeable = self.get_upgradeable(deepcopy_=False)
+
+        if upgradeable.get(url) is None:
             raise KeyError('upgradeable entry not found') from e
+
+        del upgradeable[url]
+
+        self._overwrite_db()
 
     def add_package_entry(self, url, install_filename, install_path,
                           download_filename, md5_base64, update_only=False):
@@ -87,7 +89,8 @@ class DB():
         self._overwrite_db()
 
     def add_upgradeable_entry(self, url):
-        DB.db_dict['upgradeable'][url] = {}
+        upgradeable = self.get_upgradeable(deepcopy_=False)
+        upgradeable[url] = {}
 
         self._overwrite_db()
 
@@ -110,13 +113,17 @@ class DB():
         return False
 
     def get_package_attribute(self, url, attribute, deepcopy_=True):
-        if deepcopy_:
-            return deepcopy(DB.db_dict['packages'][url][attribute])
+        packages = self.get_packages(deepcopy_=False)
 
-        return DB.db_dict['packages'][url][attribute]
+        if deepcopy_:
+            return deepcopy(packages[url][attribute])
+
+        return packages[url][attribute]
 
     def get_url_from_install_filename(self, install_filename):
-        for url, package_metadata in DB.db_dict['packages'].items():
+        packages = self.get_packages()
+
+        for url, package_metadata in packages.items():
             if package_metadata['install_filename'] == install_filename:
                 return url
 
