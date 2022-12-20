@@ -54,6 +54,9 @@ class DB():
         except KeyError as e:
             raise KeyError('upgradeable entry not found') from e
 
+    def get_upgradeable(self):
+        return DB.db_dict['upgradeable'] # TODO: add .copy() everywhere
+
     def is_package_url(self, url):
         if url in DB.db_dict['packages']:
             return True
