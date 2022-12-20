@@ -57,8 +57,27 @@ class DB():
         except KeyError as e:
             raise KeyError('upgradeable entry not found') from e
 
+    def add_package_entry(self, url, install_filename, install_path,
+                          download_filename, md5_base64):
+
+        # TODO: fix create_at and update_at (in db root too)
+
+        package_dict = {
+                'created_at': str(datetime.now()),
+                'updated_at': str(datetime.now()),
+                'install_filename': install_filename,
+                'install_path': install_path,
+                'download_filename': download_filename,
+                'md5_base64': md5_base64,
+        }
+
+        DB.db_dict['packages'][url] = package_dict
+
+        self._overwrite_db()
+
     def add_upgradeable_entry(self, url):
         DB.db_dict['upgradeable'][url] = {}
+
         self._overwrite_db()
 
     def get_upgradeable(self):
