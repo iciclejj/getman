@@ -137,18 +137,10 @@ def install_(url, install_filename=None, force=False, command=None):
         raise PermissionError('Run with sudo (\'sudo -E\' if running getman as'
                               'a python script)') from e
 
-    install_md5 = _get_base64_md5(install_path)
+    install_md5 = _get_base64_md5(install_path) # TODO: clarify b64
 
-    db['packages'][url] = {
-            'created_at': str(datetime.now()),
-            'updated_at': str(datetime.now()),
-            'install_filename': install_filename,
-            'install_path': install_path,
-            'download_filename': download_filename,
-            'md5_base64': install_md5,
-    }
-
-    db._overwrite_db()
+    db.add_package_entry(url, install_filename, install_path,
+                         download_filename, install_md5)
 
     print(f'{install_filename} successfully installed to {install_path}')
 
