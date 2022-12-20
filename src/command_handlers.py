@@ -192,9 +192,6 @@ def upgrade_(command=None):
         del upgradeable[url] # TODO: REMEMBER TO REMOVE THIS DIRECT DB EDIT
         n_upgraded += 1
 
-    # reload db_dict after modification by install
-    #         (REMOVE IF IMPLEMENTING INDEPENDENT UPGRADER)
-    db = db_module.DB() # TODO: add db.reload_db
     db['upgradeable'] = upgradeable
 
     db._overwrite_db()
