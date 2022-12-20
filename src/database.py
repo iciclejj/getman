@@ -58,13 +58,17 @@ class DB():
             raise KeyError('upgradeable entry not found') from e
 
     def add_package_entry(self, url, install_filename, install_path,
-                          download_filename, md5_base64):
-
-        # TODO: fix create_at and update_at (in db root too)
+                          download_filename, md5_base64, update_only=False):
         curr_time = str(datetime.now())
 
         created_at = curr_time
         updated_at = curr_time
+
+        if update_only:
+            if not self.is_package_url(url):
+                raise KeyError(f'{url} not found in packages.')
+
+            created_at = self.get_package_attribute(url, 'created_at')
 
         package_dict = {
                 'created_at': created_at,
