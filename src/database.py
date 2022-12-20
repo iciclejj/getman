@@ -29,6 +29,9 @@ class DB():
     def __getitem__(self, key):
         return self.db_dict[key]
 
+    def __setitem__(self, key, value):
+        self.db_dict[key] = value
+
     def remove_package_entry(self, url, include_upgradeable=True):
         # TODO: add include_install and allow indexing using install_filename
         #               remove include_upgradeable
