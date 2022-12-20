@@ -152,7 +152,7 @@ def install_(url, install_filename=None, force=False, command=None,
 def update_(command=None):
     db = db_module.DB()
 
-    packages = db.get_packages().copy() # TODO: remove .copy() later
+    packages = db.get_packages()
 
     for url, package_metadata in packages.items():
         # TODO: maybe rename content_md5 to md5_base64 (everywhere)
@@ -174,7 +174,7 @@ def update_(command=None):
 def upgrade_(command=None):
     db = db_module.DB()
 
-    upgradeable = db.get_upgradeable().copy() # TODO: remove .copy() later
+    upgradeable = db.get_upgradeable()
     n_upgraded = 0
 
     if len(upgradeable) == 0:

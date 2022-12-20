@@ -1,3 +1,4 @@
+from copy import deepcopy
 from datetime import datetime
 import json
 import os
@@ -24,7 +25,6 @@ class DB():
             with open(DB.db_path, 'r', encoding='utf-8') as db_file:
                 DB.db_dict = json.loads(db_file.read())
 
-    # TODO: .copy()
     def __getitem__(self, key):
         return DB.db_dict[key]
 
@@ -70,7 +70,8 @@ class DB():
             if not self.is_package_url(url):
                 raise KeyError(f'{url} not found in packages.')
 
-            created_at = self.get_package_attribute(url, 'created_at')
+            created_at = self.get_package_attribute(url, 'created_at',
+                                                    deepcopy_=False)
 
         package_dict = {
                 'created_at': created_at,
@@ -90,11 +91,17 @@ class DB():
 
         self._overwrite_db()
 
-    def get_upgradeable(self):
-        return DB.db_dict['upgradeable'] # TODO: add .copy() everywhere
+    def get_upgradeable(self, deepcopy_=True):
+        if deepcopy_:
+            return deepcopy(DB.db_dict['upgradeable'])
 
-    def get_packages(self):
-        return DB.db_dict['packages'] # TODO: add .copy() everywhere
+        return DB.db_dict['upgradeable']
+
+    def get_packages(self, deepcopy_=True):
+        if deepcopy_:
+            return deepcopy(DB.db_dict['packages'])
+
+        return DB.db_dict['packages']
 
     def is_package_url(self, url):
         if url in DB.db_dict['packages']:
@@ -102,7 +109,10 @@ class DB():
 
         return False
 
-    def get_package_attribute(self, url, attribute):
+    def get_package_attribute(self, url, attribute, deepcopy_=True):
+        if deepcopy_:
+            return deepcopy(DB.db_dict['packages'][url][attribute])
+
         return DB.db_dict['packages'][url][attribute]
 
     def get_url_from_install_filename(self, install_filename):
