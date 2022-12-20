@@ -12,7 +12,6 @@ class DB():
     # TODO: more efficient database updating than full overwrite
     #       maybe stop using url as primary key (use no primary key)
     #               do this for both packages and upgradeable
-    #       change FILE_NAME_DB (remove default)
 
     db_path = FILE_PATH_DB
     db_dict = None # this gets initialized only once (see __init__)

@@ -9,14 +9,14 @@ DIR_PATH_INSTALL = os.path.expanduser('~/.local/bin')
 DIR_NAME_DB = 'databases'
 DIR_PATH_DB = os.path.join(DIR_PATH_DATA, DIR_NAME_DB)
 
-DIR_NAME_PACKAGES = 'packages'
+DIR_NAME_PACKAGES = 'downloads'
 DIR_PATH_PACKAGES = os.path.join(DIR_PATH_DATA, DIR_NAME_PACKAGES)
 
 DIR_PATH_CONFIG = os.path.expanduser('~/.config/getman')
 
 # FILES
 
-FILE_NAME_DB = 'default_database.json'
+FILE_NAME_DB = 'db.json'
 FILE_PATH_DB = os.path.join(DIR_PATH_DB, FILE_NAME_DB)
 
 FILE_NAME_CONFIG = 'config.json'
