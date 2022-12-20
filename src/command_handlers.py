@@ -229,7 +229,7 @@ def uninstall_(package, is_url, command=None):
     except FileNotFoundError:
         print('Program not found in install path, skipping...')
 
-    db.remove_package_entry(url)
+    db.remove_package_entry(url=url)
 
     print('Package entry removed...')
     print('Package uninstalled.')

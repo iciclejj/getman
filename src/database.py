@@ -39,8 +39,17 @@ class DB():
         with open(self.db_path, 'w+', encoding='utf-8') as db_file:
             db_file.write(db_json)
 
-    def remove_package_entry(self, url, include_upgradeable=True):
-        # TODO: add include_install and allow indexing using install_filename
+    def remove_package_entry(self, url=None, install_filename=None,
+                             include_upgradeable=True):
+        if url is None and install_filename is None:
+            raise TypeError('Must provide url or install_filename')
+
+        if url is not None and install_filename is not None:
+            raise TypeError('Can\'t provide both url and install_filename')
+
+        if install_filename is not None:
+            url = self.get_url_from_install_filename(install_filename)
+
         if DB.db_dict['packages'].get(url) is None:
             raise KeyError(f'Package not found in database: {url}')
 
