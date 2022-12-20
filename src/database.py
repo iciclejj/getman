@@ -9,20 +9,20 @@ from constants import (
 
 class DB():
     # TODO: more efficient database updating than full overwrite
-    #       add __getitem__ instead of db.db_dict['something']
-    #       stop using url as primary key (use no primary key)
+    #       maybe stop using url as primary key (use no primary key)
     #               do this for both packages and upgradeable
-
-    # Shared db_path and db_dict across all instances
-    if not os.path.isfile(FILE_PATH_DB):
-        raise FileNotFoundError(f'{FILE_PATH_DB} not found. Try init.')
+    #       change FILE_NAME_DB (remove default)
 
     db_path = FILE_PATH_DB
-    with open(db_path, 'r', encoding='utf-8') as db_file:
-        db_dict = json.loads(db_file.read())
+    db_dict = None # this gets initialized only once (see __init__)
 
     def __init__(self):
-        pass
+        if not os.path.isfile(DB.db_path):
+            raise FileNotFoundError(f'{DB.db_path} not found. Try init.')
+
+        if DB.db_dict is None:
+            with open(DB.db_path, 'r', encoding='utf-8') as db_file:
+                DB.db_dict = json.loads(db_file.read())
 
     # TODO: .copy()
     def __getitem__(self, key):
