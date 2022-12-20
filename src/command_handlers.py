@@ -114,6 +114,27 @@ def install_(url, install_filename=None, force=False, command=None,
     filetype = magic.from_file(download_path, mime=True)
     install_path = os.path.join(DIR_PATH_INSTALL, install_filename)
 
+    # Check for filename conflict (probably some redundant code somewhere)
+    if os.path.isfile(install_path) and command != 'upgrade':
+        url_other_package = db.get_url_from_install_filename(install_filename)
+
+        if url_other_package == url:
+            pass
+        elif url_other_package is None:
+            print(f'Unrecognized file with name "{install_filename}" already'
+                  f' exists in "{DIR_PATH_INSTALL}". Please install with'
+                   ' alternate name using --name [NAME]. Aborting.')
+
+            return
+        else:
+            print(f'"{install_filename}" already exists in package database'
+                  f' with url "{url_other_package}". Please install with'
+                   ' alternate name using --name [NAME], or reinstall the'
+                   ' other package with alternate name using'
+                   ' --force --name [name]. Aborting.')
+
+            return
+
     # TODO probably don't delete the old install before checking this
     if filetype not in SUPPORTED_FILETYPES:
         os.remove(download_path)
@@ -194,7 +215,7 @@ def upgrade_(command=None):
                      command=command)
         except Exception as e:
             print(f'Error during package installation. Package:'
-                   '{install_filename} . Exception: {e}')
+                  f'{install_filename} . Exception: {e}')
             continue
 
         db.remove_upgradeable_entry(url)
