@@ -47,6 +47,13 @@ class DB():
 
         self._overwrite_db()
 
+    def remove_upgradeable_entry(self, url):
+        try:
+            del DB.db_dict['upgradeable'][url]
+            self._overwrite_db()
+        except KeyError as e:
+            raise KeyError('upgradeable entry not found') from e
+
     def is_package_url(self, url):
         if url in DB.db_dict['packages']:
             return True
