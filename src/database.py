@@ -22,6 +22,7 @@ class DB():
     def __init__(self):
         pass
 
+    # TODO: .copy()
     def __getitem__(self, key):
         return DB.db_dict[key]
 

@@ -178,24 +178,31 @@ def update_(command=None):
 
 def upgrade_(command=None):
     db = db_module.DB()
-    upgradeable = db['upgradeable']
 
+    upgradeable = db.get_upgradeable().copy() # TODO: remove .copy() later
     n_upgraded = 0
 
     # TODO: try/except
     #       show total GB before upgrade (in install too)
     #       progress bar (in install too)
     #       probably make a separate upgrade uninstaller
-    for url in list(upgradeable.keys()): # list to allow delete as we go
+    #       quote printed paths everywhere (this one isn't a path)
+    #       more concrete exception?
+
+    for url in upgradeable.keys():
         install_filename = db.get_package_attribute(url, 'install_filename')
-        install_(url, install_filename, force=True)
-        del upgradeable[url] # TODO: REMEMBER TO REMOVE THIS DIRECT DB EDIT
+
+        try:
+            install_(url, install_filename, force=True)
+        except Exception as e:
+            print(f'Error during package installation. Package:'
+                   '{install_filename} . Exception: {e}')
+
+        db.remove_upgradeable_entry(url)
+
         n_upgraded += 1
 
-    db['upgradeable'] = upgradeable
-
-    db._overwrite_db()
-
+    # TODO: fix and refactor this
     if n_upgraded > 0:
         print(f'Upgrade successful. Upgraded packages: {n_upgraded}')
     else:
