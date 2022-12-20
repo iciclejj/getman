@@ -230,6 +230,8 @@ def uninstall_(package, is_url, command=None):
     print('Package uninstalled.')
 
 def list_(command=None):
+    # TODO: --verbose or --details
+
     db = db_module.DB()
 
     packages = db.get_packages()
@@ -239,8 +241,8 @@ def list_(command=None):
         print(install_filename)
 
 def init_(purge, command=None):
-    # TODO: add option to delete all installed binaries before purging db
-    #       --verbose or --details
+    db = db_module.DB()
+
     if not init_getman.needs_init():
         force_init = user_input.prompt_yes_no(
                 'All getman files already exist. Run initialization anyways?'
@@ -260,6 +262,25 @@ def init_(purge, command=None):
         if not confirm_purge:
             print('Exiting. Nothing has been deleted. Nothing has been done.')
             return
+
+        delete_binaries = user_input.prompt_yes_no(
+                'Delete all installed binaries before purge?'
+                ' (CANNOT BE DONE AUTOMATICALLY AFTER PURGE)',
+                default=True)
+
+        if delete_binaries:
+            packages = db.get_packages()
+            install_paths = [db.get_package_attribute(url, 'install_path')
+                             for url in packages.keys()]
+
+            for install_path in install_paths:
+                try:
+                    os.remove(install_path)
+                    print(f'{install_path} removed')
+                except FileNotFoundError:
+                    print(f'{install_path} not found, skipping...')
+
+            print('Found binaries deleted.')
 
         init_getman.delete_everything()
         print('All getman directories deleted.')
