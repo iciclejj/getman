@@ -32,6 +32,8 @@ class DB():
         DB.db_dict[key] = value
 
     def _overwrite_db(self):
+        DB.db_dict['updated_at'] = str(datetime.now())
+
         db_json = json.dumps(DB.db_dict)
 
         with open(self.db_path, 'w+', encoding='utf-8') as db_file:
