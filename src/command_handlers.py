@@ -241,6 +241,19 @@ def list_(command=None):
     for install_filename in install_filenames:
         print(install_filename)
 
+def _list_verbose():
+    db = db_module.DB()
+
+    packages = db.get_packages()
+
+    for url, package_metadata in packages.items():
+        install_filename = package_metadata['install_filename']
+        install_path = package_metadata['install_path']
+
+        print(f'{install_filename} \'{install_path}\''
+              f'\n  {url}'
+               '\n')
+
 def init_(purge, command=None):
     db = db_module.DB()
 
