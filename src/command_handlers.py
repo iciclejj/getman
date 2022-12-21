@@ -33,13 +33,16 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 
 # TODO: CHECK IF FILE ALREADY EXISTS IN bin DIR. confirm whether you're
 #               confirm whether you're overwriting correct one using md5
+#       remove install on failed package entry?
+#       DON'T REMOVE OLD PACKAGE NAME BEFORE CHECKING UNRECOGNIZED FILES
+#       remove upgradeable entry on reinstall
 #
 #       EXPERIMENTAL TODOS:
 #       auto-detect system/architecture
 #       auto-detect site-specific preferred download urls
 #               (for example from git repo)
 #       use api when supported (for example api.github.com)
-#       remove install on failed package entry?
+#
 
 def install_(url, pkg_name=None, force=False, command=None,
              update_only=False):
@@ -49,8 +52,15 @@ def install_(url, pkg_name=None, force=False, command=None,
 
     # headers is an EmailMessage => returns None if key not found
     headers = _get_headers(url)
-    download_filename = headers.get_filename()
     mime_first = headers['content-type'].partition('/')[0]
+
+    if pkg_name is None:
+        pkg_name = headers.get_filename()
+
+    if pkg_name is None:
+        print('Could not determine download filename.'
+              ' Please provide custom name with --name')
+        return
 
     # TODO: Fetch the possible flags from argparser.
     #               Probably pass the entire parser
@@ -59,16 +69,6 @@ def install_(url, pkg_name=None, force=False, command=None,
         print(f'Package already in database as {pkg_name_old}.'
                ' Use -f or --force to force install.')
         return
-
-    if download_filename is None and pkg_name is None:
-        print('Could not determine download filename.'
-              ' Please provide custom name with --name')
-        return
-
-    if download_filename is None:
-        download_filename = pkg_name
-        print('NB: could not determine download_filename.'
-              ' Using provided custom program name.')
 
     # Resolve different pkg_name when force-reinstalling package
     if db.is_package_url(url):
@@ -99,15 +99,12 @@ def install_(url, pkg_name=None, force=False, command=None,
         print('Warning: could not determine if correct filetype before'
               ' downloading. Will check again after download.')
 
-    download_path = os.path.join(DIR_PATH_DOWNLOADS, download_filename)
+    download_path = os.path.join(DIR_PATH_DOWNLOADS, pkg_name)
 
     # download file to download_path
     urllib.request.urlretrieve(url, filename=download_path)
 
     # INSTALL FILE
-
-    if pkg_name is None:
-        pkg_name = pathlib.Path(download_path).stem
 
     filetype = magic.from_file(download_path, mime=True)
     install_path = os.path.join(DIR_PATH_INSTALL, pkg_name)
@@ -160,7 +157,6 @@ def install_(url, pkg_name=None, force=False, command=None,
             'url': url,
             'name': pkg_name,
             'install_path': install_path,
-            'download_filename': download_filename,
             'md5_base64': install_md5_base64,
             'update_only': update_only}
 

@@ -69,8 +69,8 @@ class DB():
 
         self._overwrite_db()
 
-    def add_package_entry(self, url, name, install_path, download_filename,
-                          md5_base64, update_only=False):
+    def add_package_entry(self, url, name, install_path, md5_base64,
+                          update_only=False):
         curr_time = str(datetime.now())
 
         created_at = curr_time
@@ -88,7 +88,6 @@ class DB():
                 'updated_at': updated_at,
                 'name': name,
                 'install_path': install_path,
-                'download_filename': download_filename,
                 'md5_base64': md5_base64,
         }
 
