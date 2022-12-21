@@ -77,25 +77,3 @@ def delete_everything():
         if isdir(dir_path):
             shutil.rmtree(dir_path)
 
-# TODO: add check for config files and subdirs
-if __name__ == '__main__':
-    init_getman()
-
-    if isdir(DIR_PATH_CONFIG):
-        print(DIR_PATH_CONFIG, 'directory exists')
-    else:
-        print('ERROR:', DIR_PATH_CONFIG, 'directory does not exist')
-
-    if isdir(DIR_PATH_DATA):
-        print(DIR_PATH_DATA, 'directory exists')
-    else:
-        print('ERROR:', DIR_PATH_DATA, 'does not exist')
-
-    print()
-
-    user_input = input('Type DELETE'
-                       ' to recursively delete all getman directories\n')
-
-    if user_input == 'DELETE':
-        delete_everything()
-
