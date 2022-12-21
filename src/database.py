@@ -63,7 +63,7 @@ class DB():
         upgradeable = self.get_upgradeable(deepcopy_=False)
 
         if upgradeable.get(url) is None:
-            raise KeyError('upgradeable entry not found') from e
+            raise KeyError('upgradeable entry not found')
 
         del upgradeable[url]
 
