@@ -32,7 +32,7 @@ def _add_install(subparsers):
                  ' database entry for the package.')
 
     parser.add_argument(
-            '-n', '--name', '--as', dest='install_filename',
+            '-n', '--name', '--as', dest='pkg_name',
             help='Provide a custom name for the installed program')
 
     parser.add_argument(

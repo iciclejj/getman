@@ -41,7 +41,11 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 #       auto-detect site-specific preferred download urls
 #               (for example from git repo)
 #       use api when supported (for example api.github.com)
-def install_(url, install_filename=None, force=False, command=None,
+#       rename content_type_first to mime_first
+#               or mime_type (as in not subtype)
+#       remove install on failed package entry?
+
+def install_(url, pkg_name=None, force=False, command=None,
              update_only=False):
     db = db_module.DB()
 
@@ -55,31 +59,29 @@ def install_(url, install_filename=None, force=False, command=None,
     # TODO: Fetch the possible flags from argparser.
     #               Probably pass the entire parser
     if not force and db.is_package_url(url):
-        install_filename_old = db.get_package_attribute(url,
-                                                        'install_filename')
-        print(f'Package already in database as {install_filename_old}.'
+        pkg_name_old = db.get_package_attribute(url, 'name')
+        print(f'Package already in database as {pkg_name_old}.'
                ' Use -f or --force to force install.')
         return
 
-    if download_filename is None and install_filename is None:
+    if download_filename is None and pkg_name is None:
         print('Could not determine download filename.'
               ' Please provide custom name with --name')
         return
 
     if download_filename is None:
-        download_filename = install_filename
+        download_filename = pkg_name
         print('NB: could not determine download_filename.'
               ' Using provided custom program name.')
 
-    # Resolve different install_filename when force-reinstalling package
+    # Resolve different pkg_name when force-reinstalling package
     if db.is_package_url(url):
-        install_filename_old = db.get_package_attribute(url,
-                                                        'install_filename')
+        pkg_name_old = db.get_package_attribute(url, 'name')
 
-        if install_filename != install_filename_old:
+        if pkg_name != pkg_name_old:
             delete_old = user_input.prompt_yes_no(
-                    f'Program previously installed as {install_filename_old}'
-                    f' (new name: {install_filename}). Delete old program'
+                    f'Program previously installed as {pkg_name_old}'
+                    f' (new name: {pkg_name}). Delete old program'
                      ' before re-installing with new name?',
                     default=True)
 
@@ -87,7 +89,7 @@ def install_(url, install_filename=None, force=False, command=None,
                 print('Keeping old install ({install_path_old})')
             else:
                 install_path_old = os.path.join(DIR_PATH_INSTALL,
-                                                install_filename_old)
+                                                pkg_name_old)
 
                 try:
                     os.remove(install_path_old)
@@ -108,26 +110,26 @@ def install_(url, install_filename=None, force=False, command=None,
 
     # INSTALL FILE
 
-    if install_filename is None:
-        install_filename = pathlib.Path(download_path).stem
+    if pkg_name is None:
+        pkg_name = pathlib.Path(download_path).stem
 
     filetype = magic.from_file(download_path, mime=True)
-    install_path = os.path.join(DIR_PATH_INSTALL, install_filename)
+    install_path = os.path.join(DIR_PATH_INSTALL, pkg_name)
 
     # Check for filename conflict (probably some redundant code somewhere)
     if os.path.isfile(install_path) and command != 'upgrade':
-        url_other_package = db.get_url_from_install_filename(install_filename)
+        url_other_package = db.get_url_from_pkg_name(pkg_name)
 
         if url_other_package == url:
             pass
         elif url_other_package is None:
-            print(f'Unrecognized file with name "{install_filename}" already'
+            print(f'Unrecognized file with name "{pkg_name}" already'
                   f' exists in "{DIR_PATH_INSTALL}". Please install with'
                    ' alternate name using --name [NAME]. Aborting.')
 
             return
         else:
-            print(f'"{install_filename}" already exists in package database'
+            print(f'"{pkg_name}" already exists in package database'
                   f' with url "{url_other_package}". Please install with'
                    ' alternate name using --name [NAME], or reinstall the'
                    ' other package with alternate name using'
@@ -160,7 +162,7 @@ def install_(url, install_filename=None, force=False, command=None,
 
     package_entry_partial = {
             'url': url,
-            'install_filename': install_filename,
+            'name': pkg_name,
             'install_path': install_path,
             'download_filename': download_filename,
             'md5_base64': install_md5_base64,
@@ -168,7 +170,7 @@ def install_(url, install_filename=None, force=False, command=None,
 
     db.add_package_entry(**package_entry_partial)
 
-    print(f'{install_filename} successfully installed to {install_path}')
+    print(f'{pkg_name} successfully installed to {install_path}')
 
 def update_(command=None):
     db = db_module.DB()
@@ -208,14 +210,14 @@ def upgrade_(command=None):
     #       more concrete exception? + better handling
 
     for url in upgradeable.keys():
-        install_filename = db.get_package_attribute(url, 'install_filename')
+        pkg_name = db.get_package_attribute(url, 'name')
 
         try:
-            install_(url, install_filename, force=True, update_only=True,
+            install_(url, pkg_name, force=True, update_only=True,
                      command=command)
         except Exception as e:
             print(f'Error during package installation. Package:'
-                  f'{install_filename} . Exception: {e}')
+                  f'{pkg_name} . Exception: {e}')
             continue
 
         db.remove_upgradeable_entry(url)
@@ -224,14 +226,15 @@ def upgrade_(command=None):
     print( 'Upgrade completed. Upgraded packages:'
           f'{n_upgraded}/{len(upgradeable)}')
 
+# TODO: rename package to pkg_name_or_url?
 def uninstall_(package, is_url, command=None):
     db = db_module.DB()
 
     if is_url:
         url = package
     else:
-        install_filename = package
-        url = db.get_url_from_install_filename(install_filename)
+        pkg_name = package
+        url = db.get_url_from_pkg_name(pkg_name)
 
     if url is None or not db.is_package_url(url):
         print('Package not found in database.')
@@ -260,11 +263,11 @@ def _list_packages():
     db = db_module.DB()
 
     packages = db.get_packages()
-    install_filenames = [db.get_package_attribute(url, 'install_filename')
-                         for url in packages.keys()]
+    pkg_names = [db.get_package_attribute(url, 'name')
+                 for url in packages.keys()]
 
-    for install_filename in install_filenames:
-        print(install_filename)
+    for pkg_name in pkg_names:
+        print(pkg_name)
 
 def _list_packages_verbose():
     db = db_module.DB()
@@ -272,10 +275,10 @@ def _list_packages_verbose():
     packages = db.get_packages()
 
     for url, package_metadata in packages.items():
-        install_filename = package_metadata['install_filename']
+        pkg_name = package_metadata['name']
         install_path = package_metadata['install_path']
 
-        print(f'{install_filename} \'{install_path}\''
+        print(f'{pkg_name} \'{install_path}\''
               f'\n  {url}'
                '\n')
 

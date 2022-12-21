@@ -38,16 +38,16 @@ class DB():
         with open(self.db_path, 'w+', encoding='utf-8') as db_file:
             db_file.write(db_json)
 
-    def remove_package_entry(self, url=None, install_filename=None,
+    def remove_package_entry(self, url=None, pkg_name=None,
                              include_upgradeable=True):
-        if url is None and install_filename is None:
-            raise TypeError('Must provide url or install_filename')
+        if url is None and pkg_name is None:
+            raise TypeError('Must provide url or pkg_name')
 
-        if url is not None and install_filename is not None:
-            raise TypeError('Can\'t provide both url and install_filename')
+        if url is not None and pkg_name is not None:
+            raise TypeError('Can\'t provide both url and pkg_name')
 
-        if install_filename is not None:
-            url = self.get_url_from_install_filename(install_filename)
+        if pkg_name is not None:
+            url = self.get_url_from_pkg_name(pkg_name)
 
         if DB.db_dict['packages'].get(url) is None:
             raise KeyError(f'Package not found in database: {url}')
@@ -69,8 +69,8 @@ class DB():
 
         self._overwrite_db()
 
-    def add_package_entry(self, url, install_filename, install_path,
-                          download_filename, md5_base64, update_only=False):
+    def add_package_entry(self, url, name, install_path, download_filename,
+                          md5_base64, update_only=False):
         curr_time = str(datetime.now())
 
         created_at = curr_time
@@ -86,7 +86,7 @@ class DB():
         package_dict = {
                 'created_at': created_at,
                 'updated_at': updated_at,
-                'install_filename': install_filename,
+                'name': name,
                 'install_path': install_path,
                 'download_filename': download_filename,
                 'md5_base64': md5_base64,
@@ -128,11 +128,11 @@ class DB():
 
         return packages[url][attribute]
 
-    def get_url_from_install_filename(self, install_filename):
+    def get_url_from_pkg_name(self, pkg_name):
         packages = self.get_packages()
 
         for url, package_metadata in packages.items():
-            if package_metadata['install_filename'] == install_filename:
+            if package_metadata['name'] == pkg_name:
                 return url
 
         # TODO: raise KeyError instead
