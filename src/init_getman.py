@@ -8,7 +8,7 @@ from config import init_config
 from constants import (
         DIR_PATH_CONFIG,
         DIR_PATH_DATA,
-        DIR_PATH_PACKAGES,
+        DIR_PATH_DOWNLOADS,
         FILE_PATH_DB,
         FILE_PATH_CONFIG,
         )
@@ -18,7 +18,7 @@ import user_input
 _GETMAN_REQUIRED_DIR_PATHS = [
         DIR_PATH_CONFIG,
         DIR_PATH_DATA,
-        DIR_PATH_PACKAGES,
+        DIR_PATH_DOWNLOADS,
         ]
 _GETMAN_REQUIRED_FILE_PATHS = [
         FILE_PATH_CONFIG,

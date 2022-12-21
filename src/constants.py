@@ -9,8 +9,8 @@ DIR_PATH_INSTALL = os.path.expanduser('~/.local/bin')
 DIR_NAME_DB = 'databases'
 DIR_PATH_DB = os.path.join(DIR_PATH_DATA, DIR_NAME_DB)
 
-DIR_NAME_PACKAGES = 'downloads'
-DIR_PATH_PACKAGES = os.path.join(DIR_PATH_DATA, DIR_NAME_PACKAGES)
+DIR_NAME_DOWNLOADS = 'downloads'
+DIR_PATH_DOWNLOADS = os.path.join(DIR_PATH_DATA, DIR_NAME_DOWNLOADS)
 
 DIR_PATH_CONFIG = os.path.expanduser('~/.config/getman')
 
@@ -27,8 +27,8 @@ if __name__ == '__main__':
     print('DIR_PATH_INSTALL: {DIR_PATH_INSTALL}')
     print('DIR_NAME_DB: {DIR_NAME_DB}')
     print('DIR_PATH_DB: {DIR_PATH_DB}')
-    print('DIR_NAME_PACKAGES: {DIR_NAME_PACKAGES}')
-    print('DIR_PATH_PACKAGES: {DIR_PATH_PACKAGES}')
+    print('DIR_NAME_DOWNLOADS: {DIR_NAME_DOWNLOADS}')
+    print('DIR_PATH_DOWNLOADS: {DIR_PATH_DOWNLOADS}')
     print('DIR_PATH_CONFIG: {DIR_PATH_CONFIG}')
 
     print('FILE_NAME_DB: {FILE_NAME_DB}')

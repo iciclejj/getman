@@ -17,7 +17,7 @@ from constants import (
         DIR_PATH_INSTALL,
         DIR_PATH_DATA,
         DIR_PATH_CONFIG,
-        DIR_PATH_PACKAGES,
+        DIR_PATH_DOWNLOADS,
         )
 
 import database as db_module
@@ -101,7 +101,7 @@ def install_(url, install_filename=None, force=False, command=None,
         print('Warning: could not determine if correct filetype before'
               ' downloading. Will check again after download.')
 
-    download_path = os.path.join(DIR_PATH_PACKAGES, download_filename)
+    download_path = os.path.join(DIR_PATH_DOWNLOADS, download_filename)
 
     # download file to download_path
     urllib.request.urlretrieve(url, filename=download_path)

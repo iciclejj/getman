@@ -2,18 +2,18 @@ import os
 
 import command_handlers
 from constants import (
-        DIR_PATH_PACKAGES,
+        DIR_PATH_DOWNLOADS,
         )
 from gm_argparse import create_parser
 from init_getman import init_getman, needs_init
 import user_input
 
 # TODO: implement download cache handler
-#       rename DIR_PATH_PACKAGES to DIR_PATH_DOWNLOAD or DIR_PATH_CACHE
+#       rename DIR_PATH_DOWNLOADS to DIR_PATH_DOWNLOAD or DIR_PATH_CACHE
 def main():
     def _clear_download_directory():
-        for filename in os.listdir(DIR_PATH_PACKAGES):
-            file_path = os.path.join(DIR_PATH_PACKAGES, filename)
+        for filename in os.listdir(DIR_PATH_DOWNLOADS):
+            file_path = os.path.join(DIR_PATH_DOWNLOADS, filename)
 
             if os.path.isfile(file_path):
                 try:
