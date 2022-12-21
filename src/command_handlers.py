@@ -24,9 +24,7 @@ import database as db_module
 import init_getman
 import user_input
 
-# must match SUPPORTED_CONTENT_TYPE_FIRSTS with startswith
-#         (text after '/' is excluded from this list)
-SUPPORTED_CONTENT_TYPE_FIRSTS = ['application']
+SUPPORTED_MIME_FIRSTS = ['application']
 SUPPORTED_FILETYPES = ['application/x-pie-executable']
 
 # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
@@ -41,8 +39,6 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 #       auto-detect site-specific preferred download urls
 #               (for example from git repo)
 #       use api when supported (for example api.github.com)
-#       rename content_type_first to mime_first
-#               or mime_type (as in not subtype)
 #       remove install on failed package entry?
 
 def install_(url, pkg_name=None, force=False, command=None,
@@ -54,7 +50,7 @@ def install_(url, pkg_name=None, force=False, command=None,
     # headers is an EmailMessage => returns None if key not found
     headers = _get_headers(url)
     download_filename = headers.get_filename()
-    content_type_first = headers['content-type'].partition('/')[0]
+    mime_first = headers['content-type'].partition('/')[0]
 
     # TODO: Fetch the possible flags from argparser.
     #               Probably pass the entire parser
@@ -99,7 +95,7 @@ def install_(url, pkg_name=None, force=False, command=None,
 
     # a bit useless in its current state
     # TODO: proper warning
-    if content_type_first not in SUPPORTED_CONTENT_TYPE_FIRSTS:
+    if mime_first not in SUPPORTED_MIME_FIRSTS:
         print('Warning: could not determine if correct filetype before'
               ' downloading. Will check again after download.')
 
