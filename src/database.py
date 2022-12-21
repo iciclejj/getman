@@ -158,6 +158,3 @@ def init_db(): # overwrite=True
 
     return FILE_PATH_DB
 
-if __name__ == '__main__':
-    pass
-
