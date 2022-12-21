@@ -24,6 +24,8 @@ import database as db_module
 import init_getman
 import user_input
 
+# TODO: create MIME_FIRSTS out of FILETYPES, rename FILETYPES (and filetype)
+#       to MIMES
 SUPPORTED_MIME_FIRSTS = ['application']
 SUPPORTED_FILETYPES = ['application/x-pie-executable']
 
@@ -48,11 +50,13 @@ def install_(url, pkg_name=None, force=False, command=None,
              update_only=False):
     db = db_module.DB()
 
-    # DOWNLOAD FILE AND METADATA
+    # DOWNLOAD METADATA, CHECK FOR CONFLICTS AND ERRORS
 
     # headers is an EmailMessage => returns None if key not found
     headers = _get_headers(url)
     mime_first = headers['content-type'].partition('/')[0]
+    install_path = os.path.join(DIR_PATH_INSTALL, pkg_name)
+    download_path = os.path.join(DIR_PATH_DOWNLOADS, pkg_name)
 
     if pkg_name is None:
         pkg_name = headers.get_filename()
@@ -93,22 +97,6 @@ def install_(url, pkg_name=None, force=False, command=None,
                 except FileNotFoundError:
                     print(f'{install_path_old} not found. Skipping deletion.')
 
-    # a bit useless in its current state
-    # TODO: proper warning
-    if mime_first not in SUPPORTED_MIME_FIRSTS:
-        print('Warning: could not determine if correct filetype before'
-              ' downloading. Will check again after download.')
-
-    download_path = os.path.join(DIR_PATH_DOWNLOADS, pkg_name)
-
-    # download file to download_path
-    urllib.request.urlretrieve(url, filename=download_path)
-
-    # INSTALL FILE
-
-    filetype = magic.from_file(download_path, mime=True)
-    install_path = os.path.join(DIR_PATH_INSTALL, pkg_name)
-
     # Check for filename conflict (probably some redundant code somewhere)
     if os.path.isfile(install_path) and command != 'upgrade':
         url_other_package = db.get_url_from_pkg_name(pkg_name)
@@ -130,9 +118,22 @@ def install_(url, pkg_name=None, force=False, command=None,
 
             return
 
+    # DOWNLOAD FILE
+
+    # a bit useless in its current state
+    if mime_first not in SUPPORTED_MIME_FIRSTS:
+        print('Warning: could not determine if correct filetype before'
+              ' downloading. Will check again after download.')
+
+    # download file to download_path
+    urllib.request.urlretrieve(url, filename=download_path)
+
+    # INSTALL FILE
+
+    filetype = magic.from_file(download_path, mime=True)
+
     # TODO probably don't delete the old install before checking this
     if filetype not in SUPPORTED_FILETYPES:
-        os.remove(download_path)
         raise ValueError(f'Unsupported filetype: {filetype}')
 
     # TODO: make this less hard-coded
