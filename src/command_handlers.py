@@ -345,25 +345,3 @@ def _get_headers(url):
     with urllib.request.urlopen(request) as response:
         return response.headers
 
-if __name__ == '__main__':
-    url = ('https://github.com/ThePBone/GalaxyBudsClient/releases/download'
-           '/4.5.2/GalaxyBudsClient_Linux_64bit_Portable.bin')
-
-    headers = _get_headers(url)
-
-    download_filename = headers.get_filename() + '.test'
-
-    download_filepath = os.path.join(DIR_PATH_PACKAGES, download_filename)
-    urllib.request.urlretrieve(url, filename=download_filepath)
-
-    print(f'download_filepath: {download_filepath}')
-
-    print(f'headers:\n\n{headers}')
-    print(f'content-md5 in headers:\n{headers["content-md5"]}\n')
-    print(f'filename in headers:\n{headers.get_filename()}\n')
-
-    if os.path.isfile(download_filepath):
-        print(f'{download_filepath} successfully saved. Now removing.')
-        os.remove(download_filepath)
-    else:
-        print(f'ERROR:\n{download_filepath} was not created.')
