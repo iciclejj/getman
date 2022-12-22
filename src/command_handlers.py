@@ -36,7 +36,6 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 # TODO: CHECK IF FILE ALREADY EXISTS IN bin DIR. confirm whether you're
 #               confirm whether you're overwriting correct one using md5
 #       remove install on failed package entry?
-#       DON'T REMOVE OLD PACKAGE NAME BEFORE CHECKING UNRECOGNIZED FILES
 #       remove upgradeable entry on reinstall
 #
 #       EXPERIMENTAL TODOS:
@@ -45,6 +44,29 @@ ssl._create_default_https_context = lambda: SSL_CONTEXT
 #               (for example from git repo)
 #       use api when supported (for example api.github.com)
 #
+
+def _try_remove_file_from_buffer(buffer, key):
+    """
+    Removes file at filepath stored in buffer[key] if it exists, and removes
+    the key from buffer.
+    If filepath doesn't exist: prints status and returns.
+    If key not in buffer: returns silently.
+    """
+    if key not in buffer:
+        return
+
+    filepath = buffer[key]
+    del buffer[key]
+
+    if filepath is None:
+        return
+
+    if not os.path.isfile(filepath):
+        print(f'{filepath} not found. Skipping deletion.')
+        return
+
+    os.remove(filepath)
+    print(f'{filepath} removed.')
 
 def install_(url, pkg_name=None, force=False, command=None,
              update_only=False):
@@ -57,6 +79,8 @@ def install_(url, pkg_name=None, force=False, command=None,
     mime_first = headers['content-type'].partition('/')[0]
     install_path = os.path.join(DIR_PATH_INSTALL, pkg_name)
     download_path = os.path.join(DIR_PATH_DOWNLOADS, pkg_name)
+
+    file_remove_buffer = {}
 
     if pkg_name is None:
         pkg_name = headers.get_filename()
@@ -85,17 +109,11 @@ def install_(url, pkg_name=None, force=False, command=None,
                      ' before re-installing with new name?',
                     default=True)
 
-            if not delete_old:
-                print('Keeping old install ({install_path_old})')
+            if delete_old:
+                install_path_old = os.path.join(DIR_PATH_INSTALL, pkg_name_old)
+                file_remove_buffer['install_path_old'] = install_path_old
             else:
-                install_path_old = os.path.join(DIR_PATH_INSTALL,
-                                                pkg_name_old)
-
-                try:
-                    os.remove(install_path_old)
-                    print(f'{install_path_old} deleted.')
-                except FileNotFoundError:
-                    print(f'{install_path_old} not found. Skipping deletion.')
+                print('Keeping old install ({install_path_old})')
 
     # Check for filename conflict (probably some redundant code somewhere)
     if os.path.isfile(install_path) and command != 'upgrade':
@@ -132,7 +150,6 @@ def install_(url, pkg_name=None, force=False, command=None,
 
     filetype = magic.from_file(download_path, mime=True)
 
-    # TODO probably don't delete the old install before checking this
     if filetype not in SUPPORTED_FILETYPES:
         raise ValueError(f'Unsupported filetype: {filetype}')
 
@@ -162,6 +179,8 @@ def install_(url, pkg_name=None, force=False, command=None,
             'update_only': update_only}
 
     db.add_package_entry(**package_entry_partial)
+
+    _try_remove_file_from_buffer(file_remove_buffer, 'install_path_old')
 
     print(f'{pkg_name} successfully installed to {install_path}')
 
