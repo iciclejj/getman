@@ -10,6 +10,8 @@ import user_input
 
 # TODO: implement download cache handler
 #       rename DIR_PATH_DOWNLOADS to DIR_PATH_DOWNLOAD or DIR_PATH_CACHE
+#       REMEMBER TO CHANGE DIR_PATH_INSTALL TO /usr/bin AT SOME POINT (?)
+
 def main():
     def _clear_download_directory():
         for filename in os.listdir(DIR_PATH_DOWNLOADS):

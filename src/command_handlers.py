@@ -24,10 +24,10 @@ import database as db_module
 import init_getman
 import user_input
 
-# TODO: create MIME_FIRSTS out of FILETYPES, rename FILETYPES (and filetype)
-#       to MIMES
-SUPPORTED_MIME_FIRSTS = ['application']
-SUPPORTED_FILETYPES = ['application/x-pie-executable']
+# MIME type, aka media type. Wikipedia: two-part identifier for file formats
+# and format contents transmitted on the Internet.
+SUPPORTED_MIMES = ['application/x-pie-executable']
+SUPPORTED_MIME_BASETYPES = [mime.split('/')[0] for mime in SUPPORTED_MIMES]
 
 # fix [SSL: CERTIFICATE_VERIFY_FAILED] error on some devices
 SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
@@ -73,7 +73,8 @@ def install_(url, pkg_name=None, force=False, command=None,
 
     # headers is an EmailMessage => returns None if key not found
     headers = _get_headers(url)
-    mime_first = headers['content-type'].partition('/')[0]
+    mime = headers['content-type']
+    mime_basetype = mime.split('/')[0]
     install_path = os.path.join(DIR_PATH_INSTALL, pkg_name)
     download_path = os.path.join(DIR_PATH_DOWNLOADS, pkg_name)
 
@@ -135,33 +136,42 @@ def install_(url, pkg_name=None, force=False, command=None,
 
     # DOWNLOAD FILE
 
+    # TODO: check if in UNSUPPORTED_MIME_FIRSTS?
     # a bit useless in its current state
-    if mime_first not in SUPPORTED_MIME_FIRSTS:
+    if mime_basetype not in SUPPORTED_MIME_BASETYPES:
         print('Warning: could not determine if correct filetype before'
-              ' downloading. Will check again after download.')
+              ' downloading. Will check again before installing.')
 
     # download file to download_path
     urllib.request.urlretrieve(url, filename=download_path)
 
     # INSTALL FILE
 
-    filetype = magic.from_file(download_path, mime=True)
+    # reassign mime (previously from content-type header)
+    mime = magic.from_file(download_path, mime=True)
+    mime_basetype = mime.split('/')[0]
 
-    if filetype not in SUPPORTED_FILETYPES:
-        raise ValueError(f'Unsupported filetype: {filetype}')
+    if mime_basetype not in SUPPORTED_MIME_BASETYPES:
+        raise ValueError(f'Unsupported filetype: {mime}')
 
-    # TODO: make this less hard-coded
+    # TODO: possibly handle different mime-types differently
     #       handle replace error
+    #       create package entry before installing binary for simpler
+    #               fixing if errors occur
     try:
-        if filetype == 'application/x-pie-executable':
-            file_st = os.stat(download_path)
-            plus_x_mode = (file_st.st_mode | stat.S_IXUSR | stat.S_IXGRP
-                           | stat.S_IXOTH)
-            os.chmod(download_path, plus_x_mode)
-            os.replace(download_path, install_path)
+        # allow execution of binary
+        file_st = os.stat(download_path)
+        plus_x_mode = (file_st.st_mode | stat.S_IXUSR | stat.S_IXGRP
+                       | stat.S_IXOTH)
+        os.chmod(download_path, plus_x_mode)
+
+        # move binary to install directory
+        os.replace(download_path, install_path)
     except PermissionError as e:
-        raise PermissionError('Run with sudo (\'sudo -E\' if running getman as'
-                              'a python script)') from e
+        raise PermissionError(
+                'Installing binary failed. Run with sudo (\'sudo -E\' if'
+                ' running getman as a python script)'
+                ) from e
 
     install_md5_base64 = _get_base64_md5(install_path)
 
