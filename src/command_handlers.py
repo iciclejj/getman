@@ -33,9 +33,7 @@ SUPPORTED_FILETYPES = ['application/x-pie-executable']
 SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 ssl._create_default_https_context = lambda: SSL_CONTEXT
 
-# TODO: CHECK IF FILE ALREADY EXISTS IN bin DIR. confirm whether you're
-#               confirm whether you're overwriting correct one using md5
-#       remove install on failed package entry?
+# TODO: remove install on failed package entry?
 #       remove upgradeable entry on reinstall
 #
 #       EXPERIMENTAL TODOS:
@@ -238,14 +236,13 @@ def upgrade_(command=None):
     print( 'Upgrade completed. Upgraded packages:'
           f'{n_upgraded}/{len(upgradeable)}')
 
-# TODO: rename package to pkg_name_or_url?
-def uninstall_(package, is_url, command=None):
+def uninstall_(pkg_name_or_url, is_url, command=None):
     db = db_module.DB()
 
     if is_url:
-        url = package
+        url = pkg_name_or_url
     else:
-        pkg_name = package
+        pkg_name = pkg_name_or_url
         url = db.get_url_from_pkg_name(pkg_name)
 
     if url is None or not db.is_package_url(url):

@@ -47,8 +47,8 @@ def _add_uninstall(subparsers):
 
     # arguments
     parser.add_argument(
-            'package',
-            help='Filename (command) of the package you wish to upgrade.'
+            'pkg_name_or_url',
+            help='Name of the package you wish to uninstall.'
                  ' Source URL can be supplied instead with -u or --url.')
 
     parser.add_argument(
