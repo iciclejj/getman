@@ -34,7 +34,6 @@ SSL_CONTEXT = ssl.create_default_context(cafile=certifi.where())
 ssl._create_default_https_context = lambda: SSL_CONTEXT
 
 # TODO: remove install on failed package entry?
-#       remove upgradeable entry on reinstall
 #
 #       EXPERIMENTAL TODOS:
 #       auto-detect system/architecture
@@ -177,6 +176,11 @@ def install_(url, pkg_name=None, force=False, command=None,
             'update_only': update_only}
 
     db.add_package_entry(**package_entry_partial)
+
+    # CLEANUP
+
+    if command != 'upgrade' and url in db.get_upgradeable():
+        db.remove_upgradeable_entry(url)
 
     _try_remove_file_from_buffer(file_remove_buffer, 'install_path_old')
 
