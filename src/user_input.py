@@ -23,7 +23,7 @@ def prompt_yes_no(message, default=None, modify=True):
     if answer.lower() in [''] and default is not None:
         return default
 
-    return input_yes_no(message, default=default, modify=False)
+    return prompt_yes_no(message, default=default, modify=False)
 
 # TODO: probably create a clearer name and/or add more functionality
 def prompt_exact(message, true_inputs, default=None, modify=True):
